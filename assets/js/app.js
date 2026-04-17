@@ -934,6 +934,7 @@ function renderPromptSentence(entry) {
     }
 
     $("#promptSent").innerHTML = parts.join(parts.length > 1 ? "<br>" : " ");
+	scrollToBottom();
 }
 
 function renderPromptWordFull(entry) {
@@ -965,6 +966,7 @@ function renderPromptSentenceFull(entry) {
     }
 
     $("#promptSent").innerHTML = parts.join("<br>");
+	scrollToBottom();
 }
 
 function setCard(entry, fromHistory = false) {
@@ -1201,6 +1203,7 @@ function showNavButtons() {
     $("#btnPrev").style.display = "";
     $("#btnReveal").style.display = "";
     $("#btnNext").style.display = "";
+	scrollToBottom();
 }
 
 
@@ -1276,6 +1279,7 @@ if (state.delayedSentenceTimer) {
 
 function showRatingButtons() {
     $("#rateBar").style.display = "flex";
+	scrollToBottom();
 }
 
 function hideRatingButtons() {
