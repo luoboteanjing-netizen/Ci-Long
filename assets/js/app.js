@@ -84,10 +84,10 @@ const TRANSLATIONS = {
         settingsVersion: "Version:",
         modeSwitchTitle: "Richtung umschalten",
         orderRandom: "Zufällig",
-        autoPlay: "Autoplay ▶︎",
-        autoPlayStop: "Autoplay ■ Stop",
-        trainingStart: "Training starten ▶",
-        trainingStop: "Training stoppen ■",
+        autoPlay: "Start Autoplay ▶︎",
+        autoPlayStop: "Stop Autoplay ■",
+        trainingStart: "Start Training ▶",
+        trainingStop: "Stop Training ■",
         prev: "◀ Zurück",
         reveal: "Aufdecken",
         next: "Nächste ▶",
@@ -149,10 +149,10 @@ const TRANSLATIONS = {
         settingsVersion: "Version:",
         modeSwitchTitle: "Switch direction",
         orderRandom: "Random",
-        autoPlay: "Autoplay ▶︎",
-        autoPlayStop: "Autoplay ■ Stop",
-        trainingStart: "Start training ▶",
-        trainingStop: "Stop training ■",
+        autoPlay: "Start Autoplay ▶︎",
+        autoPlayStop: "Stop Autoplay ■",
+        trainingStart: "Start Training ▶",
+        trainingStop: "Stop Training ■",
         prev: "◀ Back",
         reveal: "Reveal",
         next: "Next ▶",
@@ -215,9 +215,9 @@ const TRANSLATIONS = {
         modeSwitchTitle: "切换方向",
         orderRandom: "随机",
         autoPlay: "自动播放 ▶︎",
-        autoPlayStop: "自动播放 ■ 停止",
-        trainingStart: "开始训练 ▶",
-        trainingStop: "停止训练 ■",
+        autoPlayStop: "停止自动播放 ■",
+        trainingStart: "开始学习 ▶",
+        trainingStop: "停止学习 ■",
         prev: "◀ 上一张",
         reveal: "显示",
         next: "下一张 ▶",
@@ -279,10 +279,10 @@ const TRANSLATIONS = {
         settingsVersion: "Version :",
         modeSwitchTitle: "Changer de direction",
         orderRandom: "Aléatoire",
-        autoPlay: "Lecture automatique ▶︎",
-        autoPlayStop: "Lecture automatique ■ Arrêter",
-        trainingStart: "Commencer l'entraînement ▶",
-        trainingStop: "Arrêter l'entraînement ■",
+        autoPlay: "lecture auto ▶︎",
+        autoPlayStop: "arrêt lecture auto ■",
+        trainingStart: "démarrer ▶",
+        trainingStop: "arrêter ■",
         prev: "◀ Précédent",
         reveal: "Révéler",
         next: "Suivant ▶",
@@ -1750,9 +1750,13 @@ function setAutoplay(on) {
         state.autoplay.timers = [];
         releaseWakeLock();
 		scrollToTop();
+		
     }
-
+    state.trainingOn = false;
+	updateTrainingBtn();
     updateAutoplayBtn();
+	hideNavButtons();
+	hideRatingButtons();
 }
 
 function updateAutoplayBtn() {
@@ -2548,6 +2552,7 @@ if (overlay) {
 
 console.log("[INIT] Alles bereit ✅");
 });  // ✅ schließt NUR den DOMContentLoaded – korrekt!
+
 
 /* ========================================================================== */
 /* ENDE TEIL 4 */
