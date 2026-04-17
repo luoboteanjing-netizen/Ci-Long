@@ -1201,23 +1201,6 @@ html, body {
     padding-right: 0px;
 }
 
-
-/* ============================================================
-   Antwortkarte: Wort (Hanzi / Übersetzung) fett & minimal größer
-   ============================================================ */
-
-#solWord {
-    font-weight: 600;                 /* Wort fett */
-    font-size: calc(1em + 2px);       /* Wort +1px für bessere Lesbarkeit */
-}
-/* ============================================================
-   Antwortkarte: Pinyin bewusst kleiner & ruhiger darstellen
-   ============================================================ */
-
-#solWord .zh-pinyin {
-    font-weight: 400;     /* nicht fett */
-}
-
 /* ============================================================
    ZENTRALE TYPOGRAFIE – FRAGE & ANTWORT
    Alle Schriftanpassungen für Karten an EINER Stelle
@@ -1238,7 +1221,9 @@ html, body {
 #promptWordSub {
     font-size: 18px;
     font-weight: 400;
-    opacity: 0.9;
+    opacity: 1;
+	line-height: 1.4;
+	margin-bottom: 2px;
 }
 
 /* Wortart (POS) */
@@ -1246,13 +1231,15 @@ html, body {
     font-size: 16px;
     font-style: italic;
     opacity: 0.85;
+	line-height: 1.4;
+	margin-bottom: 6px;
 }
 
 /* Beispielsatz auf der Fragekarte */
 #promptSent {
     font-size: 18px;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.4;
     margin-top: 8px;
 }
 
@@ -1266,6 +1253,7 @@ html, body {
     font-size: 22px; /* +1px für bessere Hanzi-Lesbarkeit */
     font-weight: 500;           /* fett */
     line-height: 1.4;
+	margin-bottom: 4px;
 }
 
 /* Pinyin in der Antwort */
@@ -1273,6 +1261,7 @@ html, body {
     font-size: 18px;          /* bewusst kleiner als Hanzi */
     font-weight: 400;
     opacity: 1;
+	margin-bottom: 4px;
 }
 
 /* Beispielsatz in der Antwort */
