@@ -12,7 +12,12 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "6.0";   // beim nächsten Release erhöhen
+if (window.APP_VERSION) {
+  console.warn("app.js bereits geladen – Abbruch");
+} else {
+  window.APP_VERSION = "6.1.1";
+}
+
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -39,7 +44,7 @@ async function resolveCSV() {
 
     // 2. Fallback-Reihenfolge
     const candidates = [
-        "./data/HSK-Chinesisch_Lektionen.csv",
+    //    "./data/HSK-Chinesisch_Lektionen.csv",
         "./data/Long-Chinesisch_Lektionen.csv"
     ];
 
@@ -402,6 +407,9 @@ const state = {
     trainingOn: false
 };
 
+	state.reinsertQueue = [];
+	state.cardCounter = 0;
+
 /* ============================ SETTINGS / PROGRESS ========================= */
 
 function saveSettings() {
@@ -494,6 +502,8 @@ function setUILanguage(lang) {
     saveSettings();
     translateAllUI();
 }
+
+
 
 /* ============================ CSV PARSING ================================= */
 
@@ -838,7 +848,41 @@ function setTheme(theme) {
     localStorage.setItem("theme", theme);
     state.settings.theme = theme;
     saveSettings();
+	applyTheme(theme);
 }
+
+function setTaskbarColor(color) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute("content", color);
+  }
+}
+
+
+function applyTheme(theme) {
+ 
+  switch (theme) {
+    case "dark":
+      setTaskbarColor("#000000");
+      break;
+
+    case "light-orange":
+      setTaskbarColor("#ffbb55");
+      break;
+
+    case "light-warm":
+      setTaskbarColor("#c97c5d");
+      break;
+
+    case "light-blue":
+      setTaskbarColor("#3b82f6");
+      break;
+
+    default:
+      setTaskbarColor("#000000");
+  }
+}
+
 
 /* ============================ sync & scroll ============================ */
 
@@ -934,7 +978,7 @@ function renderPromptSentence(entry) {
     }
 
     $("#promptSent").innerHTML = parts.join(parts.length > 1 ? "<br>" : " ");
-	scrollToBottom();
+	/* ===scrollToBottom(); === */
 }
 
 function renderPromptWordFull(entry) {
@@ -966,7 +1010,7 @@ function renderPromptSentenceFull(entry) {
     }
 
     $("#promptSent").innerHTML = parts.join("<br>");
-	scrollToBottom();
+	/* ===scrollToBottom(); === */
 }
 
 function setCard(entry, fromHistory = false) {
@@ -1156,7 +1200,7 @@ function updateNavButtons() {
 }
 
 function nextCard() {
-
+	state.cardCounter++;
     if (!state.pool.length) return;
 
     if (state.historyPos < state.history.length - 1) {
@@ -1165,7 +1209,16 @@ function nextCard() {
         syncCardHeights();
         return;
     }
+	// 🔥 NEU: Prüfen ob eine Karte wieder erscheinen soll
+	const dueIndex = state.reinsertQueue.findIndex(item => item.due <= state.cardCounter);
 
+	if (dueIndex !== -1) {
+		const item = state.reinsertQueue.splice(dueIndex, 1)[0];
+		setCard(item.card);
+		syncCardHeights();
+		return;
+	}
+	
     let next;
 
     if (state.order === "seq") {
@@ -1318,13 +1371,19 @@ function rate(mark) {
 
         p.timesCorrect++;
     }
-    else if (mark === "unsure") {
-        // unsicher → 2 oder 3
-        if (p.box < 2)      p.box = 2;   // 1 → 2
-        else if (p.box === 2) p.box = 3; // 2 → 3
+    else if (mark === "unknown") {
+    // falsch → zurück zu 1
+    p.box = 1;
+    p.timesWrong++;
 
-        p.timesWrong++;
-    }
+    // 🔥 NEU: Karte verzögert wieder einplanen
+    const delay = Math.floor(Math.random() * 6) + 3; // 3–8 Karten
+
+    state.reinsertQueue.push({
+        card: state.current,
+        due: state.cardCounter + delay
+    });
+}
     else if (mark === "unknown") {
         // falsch → zurück zu 1
         p.box = 1;
@@ -1616,76 +1675,66 @@ function updateVoiceList() {
         return;
     }
 
-    list.forEach(v => {
+list.forEach(v => {
+    const row = document.createElement("div");
+    row.className = "voice";
 
-        const row  = document.createElement("div");
-        row.className = "voice";
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = v.name || translate("namelessVoice");
 
-        const name = document.createElement("div");
-        name.className = "name";
-        name.textContent = v.name || "(namenlos)";
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
 
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
+    const actions = document.createElement("div");
+    actions.className = "actions";
 
-        const actions = document.createElement("div");
-        actions.style.display = "flex";
-        actions.style.gap = "6px";
-        actions.style.marginLeft = "auto";
+    const btnPick = document.createElement("button");
+    btnPick.className = "btn";
+    btnPick.textContent = translate("pickVoice");
 
-        const btnPick = document.createElement("button");
-        btnPick.className = "btn";
-        btnPick.textContent = translate("pickVoice");
-
-        btnPick.onclick = () => {
-            if (state.voicePanelTarget === "zh") {
-                state.browserVoice.zh = v;
-                state.settings.browserVoiceZh =
-                    v.name || v.voiceURI;
-            } else {
-                state.browserVoice.de = v;
-                state.settings.browserVoiceDe =
-                    v.name || v.voiceURI;
-            }
-            saveSettings();
-            closeVoices();
-        };
-
-        const btnTest = document.createElement("button");
-        btnTest.className = "btn ghost";
-        btnTest.textContent = translate("testVoice");
-
-        btnTest.onclick = () => {
-            const u = new SpeechSynthesisUtterance(
-                state.voicePanelTarget === "zh"
-                    ? "这是一个测试。"
-                    : "Dies ist ein Test."
-            );
-            u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
-            u.voice = v;
-            speechSynthesis.cancel();
-            speechSynthesis.speak(u);
-        };
-
-        const active = state.voicePanelTarget === "zh"
-            ? state.browserVoice.zh
-            : state.browserVoice.de;
-
-        if (active &&
-            (active.name === v.name || active.voiceURI === v.voiceURI)) {
-            name.textContent += ` ${translate("voiceActiveSuffix")}`;
+    btnPick.onclick = () => {
+        if (state.voicePanelTarget === "zh") {
+            state.browserVoice.zh = v;
+            state.settings.browserVoiceZh = v.name || v.voiceURI;
+        } else {
+            state.browserVoice.de = v;
+            state.settings.browserVoiceDe = v.name || v.voiceURI;
         }
+        saveSettings();
+        closeVoices();
+    };
 
-        actions.appendChild(btnPick);
-        actions.appendChild(btnTest);
+    const btnTest = document.createElement("button");
+    btnTest.className = "btn ghost";
+    btnTest.textContent = translate("testVoice");
 
-        row.appendChild(name);
-        row.appendChild(meta);
-        row.appendChild(actions);
+    btnTest.onclick = () => {
+        const u = new SpeechSynthesisUtterance(
+            state.voicePanelTarget === "zh" ? "这是一个测试。" : "Dies ist ein Test."
+        );
+        u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
+        u.voice = v;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+    };
 
-        box.appendChild(row);
-    });
+    // Aktive Stimme markieren
+    const active = state.voicePanelTarget === "zh" ? state.browserVoice.zh : state.browserVoice.de;
+    if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
+        name.textContent += ` ${translate("voiceActiveSuffix")}`;
+    }
+
+    actions.appendChild(btnPick);
+    actions.appendChild(btnTest);
+
+    row.appendChild(name);
+    row.appendChild(meta);
+    row.appendChild(actions);
+
+    box.appendChild(row);
+});
 }
 
 
@@ -2057,18 +2106,62 @@ const js  = document.querySelector("#jsMain");
 
 if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
 if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
-    console.log("[INIT] Starte Initialisierung …");
+
+console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
 
     /* ============================================================
        SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
        ============================================================ */
     loadSettings();
+	applyTheme(state.settings.theme);
     loadProgress();
     resetSessionStats();  // Session-Stats initialisieren
 	
 	// ✅ Resume-Fortschritt pro Lektion initialisieren
 if (!state.settings.resumeIndexByLesson) {
     state.settings.resumeIndexByLesson = {};
+}
+
+// ==========================================
+// PWA Install Button
+// ==========================================
+
+let deferredPrompt = null;
+
+const installButton = document.getElementById("btnInstall");
+
+if (installButton) {
+    // Button zunächst ausblenden
+    installButton.style.display = "none";
+
+    // Event abfangen, wenn der Browser die Installation anbietet
+    window.addEventListener("beforeinstallprompt", (e) => {
+        console.log("✅ beforeinstallprompt ausgelöst");
+        e.preventDefault();           // Verhindert den automatischen Prompt
+        deferredPrompt = e;           // Speichern für später
+        installButton.style.display = "block";   // Button anzeigen
+    });
+
+    // Button-Klick → Installation starten
+    installButton.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+
+        installButton.style.display = "none";   // Button verstecken
+
+        deferredPrompt.prompt();   // Install-Prompt anzeigen
+
+        const choiceResult = await deferredPrompt.userChoice;
+        console.log("Install choice:", choiceResult.outcome);
+
+        deferredPrompt = null;     // Zurücksetzen
+    });
+
+    // Optional: Button wieder verstecken, wenn App bereits installiert wurde
+    window.addEventListener("appinstalled", () => {
+        console.log("✅ App wurde installiert");
+        installButton.style.display = "none";
+        deferredPrompt = null;
+    });
 }
 
     // Theme laden
@@ -2557,10 +2650,15 @@ if (overlay) {
 console.log("[INIT] Alles bereit ✅");
 });  // ✅ schließt NUR den DOMContentLoaded – korrekt!
 
-
-/* ========================================================================== */
-/* ENDE TEIL 4 */
-/* ========================================================================== */
+/* ==
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(reg => console.log("SW registered", reg))
+      .catch(err => console.error("SW error", err));
+  });
+}
+==== */
 /* ========================================================================== */
 /*                                ENDE TEIL 4                                 */
 /* ========================================================================== */
