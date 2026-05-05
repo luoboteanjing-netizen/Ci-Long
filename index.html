@@ -13,8 +13,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="CiLong">
-	<a href="help.html" target="_blank">Hilfe</a>
-
+	
     <!-- Styles & Script mit Versionierung -->
 	<link id="cssMain" rel="stylesheet" href="./assets/css/style.css">
     <script id="jsMain" src="./assets/js/app.js"></script>
@@ -69,6 +68,10 @@
             <input id="delayInput" type="number" min="0" max="15" step="0.5" value="5" class="menu-input">
         </div>
 		
+		<button onclick="window.open('help.html', '_blank')">
+		  📘 Hilfe
+		</button>
+
         <div class="menu-version">
             <span data-i18n="settingsVersion">Version:</span> <span id="appVersion"></span>
         </div>
