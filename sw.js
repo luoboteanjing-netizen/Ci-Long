@@ -2,17 +2,21 @@
 // Service Worker – Learning App
 // ==========================================
 
-const APP_CACHE = "learning-app-shell-v2";
+const APP_CACHE = "flashcards-v6.1.2";
 const CSV_CACHE = "learning-app-csv-v1";
 
-// ?? Statische Dateien (App-Shell)
+// ==========================================
+// App-Shell (statische Dateien)
+// ==========================================
 const STATIC_ASSETS = [
-  "index.html",
-  "assets/css/style.css",
-  "assets/js/app.js",
-  "manifest.json",
-  "icons/icon-192.png",
-  "icons/icon-512.png"
+  "./",
+  "./index.html",
+  "./help.html",
+  "./assets/css/style.css",
+  "./assets/js/app.js",
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 // ==========================================
@@ -21,7 +25,9 @@ const STATIC_ASSETS = [
 self.addEventListener("install", event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(APP_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
+    caches.open(APP_CACHE).then(cache => {
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
 });
 
@@ -48,17 +54,17 @@ self.addEventListener("activate", event => {
 // ==========================================
 self.addEventListener("fetch", event => {
   const req = event.request;
-  const url = req.url;
+  const url = new URL(req.url);
 
   if (req.method !== "GET") return;
 
-  // ? CSV: Network First (Content aktualisieren)
-  if (url.endsWith(".csv")) {
+  // ? CSV ? Network First (inkl. ?csv=...)
+  if (url.pathname.endsWith(".csv")) {
     event.respondWith(networkFirstCSV(req));
     return;
   }
 
-  // ? App-Shell: Cache First (stabil)
+  // ? App-Shell ? Cache First
   event.respondWith(
     caches.match(req).then(cached => {
       if (cached) return cached;
@@ -81,9 +87,9 @@ async function networkFirstCSV(request) {
     const response = await fetch(request);
     cache.put(request, response.clone());
     return response;
-  } catch {
+  } catch (e) {
     const cached = await cache.match(request);
     if (cached) return cached;
-    throw new Error("CSV offline nicht verfügbar");
+    throw e;
   }
 }
