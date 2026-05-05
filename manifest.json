@@ -1,10 +1,10 @@
 {
   "name": "Flashcards Chinesisch",
-  "short_name": "CíLóng Shīfu",
+  "short_name": "CiLong",
   "description": "Chinesisch Flashcards mit Leitner-System und TTS",
   "start_url": "./index.html",
-  "scope": "/Flashcards-Chinesisch/",
-  "id": "/Flashcards-Chinesisch/",
+  "scope": "/Chinesisch-Lektionen/",
+  "id": "/Chinesisch-Lektionen/",
   "display": "standalone",
   "orientation": "portrait",
   "icons": [
