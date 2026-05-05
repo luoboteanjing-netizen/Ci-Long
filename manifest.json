@@ -3,8 +3,8 @@
   "short_name": "CíLóng Shīfu",
   "description": "Chinesisch Flashcards mit Leitner-System und TTS",
   "start_url": "./index.html",
-  "scope": "/Flashcards-Chinesisch/",
-  "id": "/Flashcards-Chinesisch/",
+  "scope": "/Ci-Long/",
+  "id": "/Ci-Long/",
   "display": "standalone",
   "orientation": "portrait",
   "icons": [
