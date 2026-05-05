@@ -12,10 +12,6 @@ const STATIC_ASSETS = [
   "assets/css/style.css",
   "assets/js/app.js",
   "manifest.json",
-  "assets/img/header-dark.png",
-  "assets/img/header-light.png",
-  "assets/img/header-warm.png",
-  "assets/img/header-blue.png",
   "icons/icon-192.png",
   "icons/icon-512.png"
 ];
