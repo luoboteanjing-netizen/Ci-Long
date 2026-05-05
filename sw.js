@@ -5,18 +5,19 @@
 const APP_CACHE = "flashcards-v6.1.2";
 const CSV_CACHE = "learning-app-csv-v1";
 
-// ==========================================
-// App-Shell (statische Dateien)
-// ==========================================
+// ?? Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
-  "./",
-  "./index.html",
-  "./help.html",
-  "./assets/css/style.css",
-  "./assets/js/app.js",
-  "./manifest.json",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "index.html",
+  "help.html",
+  "assets/css/style.css",
+  "assets/js/app.js",
+  "manifest.json",
+  "assets/img/header-dark.png",
+  "assets/img/header-light.png",
+  "assets/img/header-warm.png",
+  "assets/img/header-blue.png",
+  "icons/icon-192.png",
+  "icons/icon-512.png"
 ];
 
 // ==========================================
@@ -25,9 +26,7 @@ const STATIC_ASSETS = [
 self.addEventListener("install", event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(APP_CACHE).then(cache => {
-      return cache.addAll(STATIC_ASSETS);
-    })
+    caches.open(APP_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
   );
 });
 
@@ -54,17 +53,17 @@ self.addEventListener("activate", event => {
 // ==========================================
 self.addEventListener("fetch", event => {
   const req = event.request;
-  const url = new URL(req.url);
+  const url = req.url;
 
   if (req.method !== "GET") return;
 
-  // ? CSV ? Network First (inkl. ?csv=...)
-  if (url.pathname.endsWith(".csv")) {
+  // ? CSV: Network First (Content aktualisieren)
+  if (url.endsWith(".csv")) {
     event.respondWith(networkFirstCSV(req));
     return;
   }
 
-  // ? App-Shell ? Cache First
+  // ? App-Shell: Cache First (stabil)
   event.respondWith(
     caches.match(req).then(cached => {
       if (cached) return cached;
@@ -87,9 +86,9 @@ async function networkFirstCSV(request) {
     const response = await fetch(request);
     cache.put(request, response.clone());
     return response;
-  } catch (e) {
+  } catch {
     const cached = await cache.match(request);
     if (cached) return cached;
-    throw e;
+    throw new Error("CSV offline nicht verfügbar");
   }
 }
