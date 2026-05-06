@@ -444,7 +444,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #btnVoiceDe + .voice-config,
 #btnVoiceZh + .voice-config {
  margin-top: 8px; /* Zusätzlicher Abstand nach dem Button */
- margin-bottom: 8px;
+ margin-bottom: 20px;
 }
 .voice-config > *:first-child { /* Erstes Element in der Config (z.B. Label "ZH Tempo") */
  margin-top: 12px; /* Mehr Abstand zum Button darüber – das macht den Unterschied */
