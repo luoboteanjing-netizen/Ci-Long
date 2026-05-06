@@ -450,7 +450,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 /* Kleinerer Abstand der Labels zu den Sliders (ZH und DE) */
 .voice-config .lbl { /* Überschreibt den globalen .lbl-Margin */
- margin-bottom: 2px; /* Stark reduziert: Labels sehr nah an den Sliders darunter */
+ margin-bottom: 0px; /* Stark reduziert: Labels sehr nah an den Sliders darunter */
  text-align: left; /* Andere Labels (z.B. in Voice-Config) bleiben linksbündig */
 }
 #rateZhVal, #pitchZhVal {
@@ -503,7 +503,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  #rateZhVal, #pitchZhVal, #rateDeVal, #pitchDeVal, #gapVal { font-size:11px; }
  .voice-config { gap:6px; }
  .voice-config > *:first-child { margin-top:8px; }
- .voice-config .lbl { margin-bottom:3px; }
+ .voice-config .lbl { margin-bottom:0px; }
 }
 
 /* ============================================================
