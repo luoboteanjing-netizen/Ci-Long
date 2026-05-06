@@ -436,7 +436,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 /* NEUE REGELN: Abstände anpassen für ZH-Sektion (und DE, falls ähnlich) */
 .voice-config {
- gap: 10px; /* Erhöhtes Gap: Mehr Abstand zwischen allen Elementen (inkl. Button oben und Sliders) */
+ gap: 20px; /* Erhöhtes Gap: Mehr Abstand zwischen allen Elementen (inkl. Button oben und Sliders) */
 }
 
 /* Speziell: Größerer Abstand direkt nach den Voice-Buttons (DE/ZH Stimme wählen) */
