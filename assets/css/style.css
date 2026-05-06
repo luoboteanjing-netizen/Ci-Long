@@ -419,7 +419,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 	justify-content: center; 
 	text-align: center;} /* Zentrierung der Beschriftungen (z.B. "DE"/"ZH") – horizontal/vertikal perfekt */
 .btn.swap{font-weight:600;padding:8px 10px}
-.gap-row input[type=range]{width:95%}
+.gap-row input[type=range]{width:97%}
 .two-col{display:flex; flex-wrap:wrap; gap:10px}
 .two-col > *{flex:1 1 calc(50% - 10px); max-width:calc(50% - 10px)}
 .voice-btn{width:100%}
