@@ -428,8 +428,20 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .voice-btn{width:100%}
 .voice-config{display:flex;flex-direction:column;gap:10px}
 .voice-range{width:100%}
-.ratebar{display:flex;gap:8px;justify-content:center;align-items:stretch;flex-wrap:nowrap;margin:10px 0 6px}
-.ratebar .btn{flex:0 0 calc((100% - 16px)/3); max-width:calc((100% - 16px)/3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:16px 12px}
+.ratebar{
+  display:flex;
+  gap:8px;
+  margin:10px 0 6px;
+}
+
+.ratebar .btn{
+  flex:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding:16px 12px;
+}
+
 @media(max-width:480px){ .ratebar .btn{padding:12px 10px; font-size:12px} }
 @media(max-width:460px){ header h1{font-size:20px} .subtitle{font-size:12px} }
 @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
