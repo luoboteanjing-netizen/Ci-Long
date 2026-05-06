@@ -426,7 +426,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
   gap: 10px;
 }
 .voice-btn{width:100%}
-.voice-config{display:flex;flex-direction:column;gap:6px}
+.voice-config{display:flex;flex-direction:column;gap:10px}
 .voice-range{width:100%}
 .ratebar{display:flex;gap:8px;justify-content:center;align-items:stretch;flex-wrap:nowrap;margin:10px 0 6px}
 .ratebar .btn{flex:0 0 calc((100% - 16px)/3); max-width:calc((100% - 16px)/3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:16px 12px}
