@@ -430,7 +430,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .voice-range{width:100%}
 .ratebar{
   display:flex;
-  gap:14px;
+  gap:20px;
   margin:10px 0 6px;
 }
 
