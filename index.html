@@ -135,15 +135,6 @@
                 <button id="btnVoiceDe" class="btn large fit voice-btn" data-i18n="voiceButtonDe">DE Stimme</button>
                 <button id="btnVoiceZh" class="btn large fit voice-btn" data-i18n="voiceButtonZh">ZH Stimme</button>
             </div>
-
-            <div class="mt8 gap-row">
-                <label class="lbl" data-i18n="autoplayGapLabel">
-                    Pause zw. Karten im Autoplay:
-                    <span id="gapVal" class="hint">(0.8 s)</span>
-                </label>
-                <input id="gapRange" type="range" min="0.6" max="2.5" step="0.1" value="0.8">
-            </div>
-			
 			
             <div class="two-col mt8 voice-grids">
                 <div class="voice-config">
@@ -163,6 +154,16 @@
                 </div>
             </div>
 
+			
+            <div class="mt8 gap-row">
+                <label class="lbl" data-i18n="autoplayGapLabel">
+                    Pause zw. Karten im Autoplay:
+                    <span id="gapVal" class="hint">(0.8 s)</span>
+                </label>
+                <input id="gapRange" type="range" min="0.6" max="2.5" step="0.1" value="0.8">
+            </div>
+			
+			
             <div class="stack mt12">
                 <div class="training-group">
                     <button id="btnStart" class="btn primary" data-i18n="trainingStart">Training starten ▶</button>
