@@ -607,11 +607,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 
 /* ================== BUTTON-KOSMETIK ================== */
-.ratebar .btn { flex: 1 1 0; max-width: none; text-align:center; }
+.ratebar .btn { flex: 1 1 0; text-align:center; }
 .card-controls .btn { flex: 1 1 0; max-width:none; text-align:center; }
-.card-controls, .ratebar { justify-content:center; display:flex; }
-.card-controls .btn, .ratebar .btn { min-width:100px; }
-.ratebar { gap:28px; }
+.card-controls { justify-content:center; display:flex; }
+.card-controls .btn { min-width:100px; }
 .card-controls { gap:8px; }
 /* ================== JETZT AUFDECKEN ================== */
 
