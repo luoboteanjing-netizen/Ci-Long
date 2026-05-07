@@ -65,7 +65,7 @@
    Header-Banner – Default (Dark Mode)
    ============================================================ */
 .header-banner {
-    content: url("../img/header.png");
+    content: url("../img/header.webp");
     width: 100%;
     max-width: 1100px;
     height: auto;
@@ -78,14 +78,14 @@
    ============================================================ */
    
 html.light-orange .header-banner {
-    content: url("../img/header-light.png");
+    content: url("../img/header-light.webp");
 }
 html.light-warm .header-banner {
-    content: url("../img/header-warm.png");
+    content: url("../img/header-warm.webp");
 }
 
 html.light-blue .header-banner {
-    content: url("../img/header-blue.png");
+    content: url("../img/header-blue.webp");
 }
 
 main.container {
@@ -1217,7 +1217,7 @@ body.menu-open #menuToggle::before {
     background-clip: padding-box;
 }
 /* ============================================================
-   Header-Banner (PNG statt Text-Header)
+   Header-Banner (webp statt Text-Header)
    ============================================================ */
 
 .app-header {
