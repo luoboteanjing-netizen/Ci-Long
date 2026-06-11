@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.3.4";
+  window.APP_VERSION = "6.3.5";
 }
 
 
@@ -1127,7 +1127,7 @@ function gatherPoolFromSettings() {
 function hapticFeedback() {
     // Prüft, ob das Gerät Vibration unterstützt
     if ("vibrate" in navigator) {
-        navigator.vibrate(70); // Kurzer 40ms Impuls
+        navigator.vibrate(60); // Kurzer 40ms Impuls
     }
 }
 
