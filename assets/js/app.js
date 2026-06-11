@@ -3686,7 +3686,7 @@ if (overlay) {
 console.log("[INIT] Alles bereit ✅");
 });  // ✅ schließt NUR den DOMContentLoaded – korrekt!
 
-/* ==
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js")
@@ -3694,7 +3694,7 @@ if ("serviceWorker" in navigator) {
       .catch(err => console.error("SW error", err));
   });
 }
-==== */
+
 /* ========================================================================== */
 /*                                ENDE TEIL 4                                 */
 /* ========================================================================== */
