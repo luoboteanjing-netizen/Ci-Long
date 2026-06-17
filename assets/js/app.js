@@ -607,7 +607,69 @@ async function playAudioResource(url) {
         if (res.ok) await playBlob(await res.blob());
     } catch (e) { console.warn('playAudioResource error', e); }
 }
+/* ============================================================
+   PATCH-SYSTEM – Einzelne MP3s nachladen ohne Komplett-Download
+   ============================================================ */
 
+const PATCH_MANIFEST_URL = `${RELEASE_BASE}/patch_manifest.json`;
+const PATCH_VERSION_KEY  = "fc_patch_version";
+
+async function checkAndApplyPatches() {
+    try {
+        const res = await fetch(PATCH_MANIFEST_URL + "?t=" + Date.now());
+        if (!res.ok) return;
+        const manifest = await res.json();
+
+        const knownVersion = localStorage.getItem(PATCH_VERSION_KEY);
+        if (knownVersion === manifest.version) return;
+
+        let count = 0;
+
+        for (const patch of manifest.patches) {
+            const isDE    = patch.lang === "de";
+            const cacheKey = isDE
+                ? CACHE_PREFIX + "de-" + patch.voice   // z.B. "fc-audio-de-katja"
+                : CACHE_PREFIX + patch.voice;           // z.B. "fc-audio-xiaoxiao"
+
+            // R2-URL zum Herunterladen
+            const downloadBase = `${RELEASE_BASE}/${patch.voice}/${patch.speed}`;
+            // Lokaler Pfad als Cache-Key (genau wie beim ZIP-Download)
+            const localBase = isDE
+                ? `${AUDIO_BASE_DE}/${patch.voice}/${patch.speed}`
+                : `${AUDIO_BASE}/${patch.voice}/${patch.speed}`;
+
+            const cache = await caches.open(cacheKey);
+
+            for (const filename of patch.files) {
+                const downloadUrl = `${downloadBase}/${encodeURIComponent(filename)}`;
+                const cacheUrl    = `${localBase}/${encodeURIComponent(filename)}`;
+                try {
+                    const fileRes = await fetch(downloadUrl);
+                    if (fileRes.ok) {
+                        await cache.put(cacheUrl, fileRes);
+                        count++;
+                    }
+                } catch (e) {
+                    console.warn("Patch-Download fehlgeschlagen:", filename, e);
+                }
+            }
+        }
+
+        localStorage.setItem(PATCH_VERSION_KEY, manifest.version);
+        if (count > 0) showPatchBanner(count);
+
+    } catch (e) {
+        console.warn("Patch-Check fehlgeschlagen:", e);
+    }
+}
+
+function showPatchBanner(count) {
+    const banner = document.getElementById("patchBanner");
+    if (!banner) return;
+    banner.textContent = `✅ ${count} Vokabel-Datei${count !== 1 ? "en" : ""} aktualisiert`;
+    banner.classList.add("visible");
+    setTimeout(() => banner.classList.remove("visible"), 4000);
+}
 /* ============================ GLOBAL STATE =============================== */
 
 const state = {
@@ -3059,6 +3121,7 @@ console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
 	applyTheme(state.settings.theme);
     loadProgress();
     resetSessionStats();  // Session-Stats initialisieren
+	checkAndApplyPatches();
 	
 	// ✅ Resume-Fortschritt pro Lektion initialisieren
 if (!state.settings.resumeIndexByLesson) {
