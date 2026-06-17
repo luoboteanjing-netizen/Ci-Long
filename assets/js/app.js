@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.3.6";
+  window.APP_VERSION = "6.3.7";
 }
 
 
@@ -2562,7 +2562,7 @@ function updateVoiceList() {
         btnTest.textContent = translate("testVoice");
         btnTest.onclick = () => {
             const u = new SpeechSynthesisUtterance(
-                state.voicePanelTarget === "zh" ? "这是一个测试。" : "Dies ist ein Test."
+                state.voicePanelTarget === "zh" ? "我很高兴见到你。" : "Es freut mich sehr dich zu sehen."
             );
             u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
             u.voice = v;
