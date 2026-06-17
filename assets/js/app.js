@@ -124,8 +124,8 @@ const TRANSLATIONS = {
         searchEmptyResults: "Keine Treffer gefunden.",
         noVoicesFound: "Keine passenden Stimmen gefunden.",
         namelessVoice: "(namenlos)",
-        pickVoice: "Diese Stimme wählen",
-        testVoice: "Probehören",
+        pickVoice: "✓ Übernehmen",
+        testVoice: "▶ Probehören",
         voiceActiveSuffix: "• [Aktiv]",
         selectLessonAlert: "Bitte zuerst Lektionen auswählen.",
         selectLessonAlert2: "Bitte Lektionen wählen.",
@@ -2574,9 +2574,8 @@ function updateVoiceList() {
         if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
             name.textContent += ` ${translate("voiceActiveSuffix")}`;
         }
-
-        actions.appendChild(btnPick);
         actions.appendChild(btnTest);
+        actions.appendChild(btnPick);
         row.appendChild(name);
         row.appendChild(meta);
         row.appendChild(actions);
