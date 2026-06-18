@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.3.6";
+  window.APP_VERSION = "6.3.7";
 }
 
 
@@ -124,8 +124,8 @@ const TRANSLATIONS = {
         searchEmptyResults: "Keine Treffer gefunden.",
         noVoicesFound: "Keine passenden Stimmen gefunden.",
         namelessVoice: "(namenlos)",
-        pickVoice: "Diese Stimme wählen",
-        testVoice: "Probehören",
+        pickVoice: "✓ Übernehmen",
+        testVoice: "▶ Probehören",
         voiceActiveSuffix: "• [Aktiv]",
         selectLessonAlert: "Bitte zuerst Lektionen auswählen.",
         selectLessonAlert2: "Bitte Lektionen wählen.",
@@ -198,8 +198,8 @@ const TRANSLATIONS = {
         searchEmptyResults: "No results found.",
         noVoicesFound: "No matching voices found.",
         namelessVoice: "(nameless)",
-        pickVoice: "Pick this voice",
-        testVoice: "Listen",
+        pickVoice: "✓ accept",
+        testVoice: "▶ Listen",
         voiceActiveSuffix: "• [Active]",
         selectLessonAlert: "Please choose lessons first.",
         selectLessonAlert2: "Please choose lessons.",
@@ -274,8 +274,8 @@ const TRANSLATIONS = {
         searchEmptyResults: "未找到结果。",
         noVoicesFound: "未找到匹配语音。",
         namelessVoice: "(无名)",
-        pickVoice: "选择此语音",
-        testVoice: "试听",
+        pickVoice: "✓ 接受",
+        testVoice: "▶ 试听",
         voiceActiveSuffix: "• [已激活]",
         selectLessonAlert: "请先选择课程。",
         selectLessonAlert2: "请选择课程。",
@@ -350,8 +350,8 @@ const TRANSLATIONS = {
         searchEmptyResults: "Aucun résultat trouvé.",
         noVoicesFound: "Aucune voix correspondante trouvée.",
         namelessVoice: "(sans nom)",
-        pickVoice: "Choisir cette voix",
-        testVoice: "Écouter",
+        pickVoice: "✓ accepter",
+        testVoice: "▶ Écouter",
         voiceActiveSuffix: "• [Actif]",
         selectLessonAlert: "Veuillez d'abord choisir des leçons.",
         selectLessonAlert2: "Veuillez choisir des leçons.",
@@ -607,7 +607,69 @@ async function playAudioResource(url) {
         if (res.ok) await playBlob(await res.blob());
     } catch (e) { console.warn('playAudioResource error', e); }
 }
+/* ============================================================
+   PATCH-SYSTEM – Einzelne MP3s nachladen ohne Komplett-Download
+   ============================================================ */
 
+const PATCH_MANIFEST_URL = `${RELEASE_BASE}/patch_manifest.json`;
+const PATCH_VERSION_KEY  = "fc_patch_version";
+
+async function checkAndApplyPatches() {
+    try {
+        const res = await fetch(PATCH_MANIFEST_URL + "?t=" + Date.now());
+        if (!res.ok) return;
+        const manifest = await res.json();
+
+        const knownVersion = localStorage.getItem(PATCH_VERSION_KEY);
+        if (knownVersion === manifest.version) return;
+
+        let count = 0;
+
+        for (const patch of manifest.patches) {
+            const isDE    = patch.lang === "de";
+            const cacheKey = isDE
+                ? CACHE_PREFIX + "de-" + patch.voice   // z.B. "fc-audio-de-katja"
+                : CACHE_PREFIX + patch.voice;           // z.B. "fc-audio-xiaoxiao"
+
+            // R2-URL zum Herunterladen
+            const downloadBase = `${RELEASE_BASE}/${patch.voice}/${patch.speed}`;
+            // Lokaler Pfad als Cache-Key (genau wie beim ZIP-Download)
+            const localBase = isDE
+                ? `${AUDIO_BASE_DE}/${patch.voice}/${patch.speed}`
+                : `${AUDIO_BASE}/${patch.voice}/${patch.speed}`;
+
+            const cache = await caches.open(cacheKey);
+
+            for (const filename of patch.files) {
+                const downloadUrl = `${downloadBase}/${encodeURIComponent(filename)}`;
+                const cacheUrl    = `${localBase}/${encodeURIComponent(filename)}`;
+                try {
+                    const fileRes = await fetch(downloadUrl);
+                    if (fileRes.ok) {
+                        await cache.put(cacheUrl, fileRes);
+                        count++;
+                    }
+                } catch (e) {
+                    console.warn("Patch-Download fehlgeschlagen:", filename, e);
+                }
+            }
+        }
+
+        localStorage.setItem(PATCH_VERSION_KEY, manifest.version);
+        if (count > 0) showPatchBanner(count);
+
+    } catch (e) {
+        console.warn("Patch-Check fehlgeschlagen:", e);
+    }
+}
+
+function showPatchBanner(count) {
+    const banner = document.getElementById("patchBanner");
+    if (!banner) return;
+    banner.textContent = `✅ ${count} Vokabel-Datei${count !== 1 ? "en" : ""} aktualisiert`;
+    banner.classList.add("visible");
+    setTimeout(() => banner.classList.remove("visible"), 4000);
+}
 /* ============================ GLOBAL STATE =============================== */
 
 const state = {
@@ -2562,7 +2624,7 @@ function updateVoiceList() {
         btnTest.textContent = translate("testVoice");
         btnTest.onclick = () => {
             const u = new SpeechSynthesisUtterance(
-                state.voicePanelTarget === "zh" ? "这是一个测试。" : "Dies ist ein Test."
+                state.voicePanelTarget === "zh" ? "我很高兴见到你。" : "Es freut mich sehr dich zu sehen."
             );
             u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
             u.voice = v;
@@ -2574,9 +2636,8 @@ function updateVoiceList() {
         if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
             name.textContent += ` ${translate("voiceActiveSuffix")}`;
         }
-
-        actions.appendChild(btnPick);
         actions.appendChild(btnTest);
+        actions.appendChild(btnPick);
         row.appendChild(name);
         row.appendChild(meta);
         row.appendChild(actions);
@@ -3060,6 +3121,7 @@ console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
 	applyTheme(state.settings.theme);
     loadProgress();
     resetSessionStats();  // Session-Stats initialisieren
+	checkAndApplyPatches();
 	
 	// ✅ Resume-Fortschritt pro Lektion initialisieren
 if (!state.settings.resumeIndexByLesson) {
