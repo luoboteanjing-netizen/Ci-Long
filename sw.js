@@ -1,5 +1,5 @@
 // ==========================================
-// Service Worker – Learning App
+// Service Worker ? Learning App
 // ==========================================
 
 const APP_CACHE = "flashcards-v6.3.7";
@@ -58,6 +58,16 @@ self.addEventListener("fetch", event => {
 
   if (req.method !== "GET") return;
 
+  // ? MP3-Audiodateien: NICHT abfangen!
+  // Diese werden komplett eigenständig von app.js über die
+  // fc-audio-* Caches verwaltet (ZIP-Download + Patch-System).
+  // Der Service Worker darf hier nicht eingreifen, sonst entstehen
+  // fälschliche 404-Fehler und Race-Conditions.
+  if (url.endsWith(".mp3")) return;
+
+  // ? Anfragen an Cloudflare R2: NICHT abfangen!
+  if (url.includes("r2.dev")) return;
+
   // ? CSV: Network First (Content aktualisieren)
   if (url.endsWith(".csv")) {
     event.respondWith(networkFirstCSV(req));
@@ -90,6 +100,6 @@ async function networkFirstCSV(request) {
   } catch {
     const cached = await cache.match(request);
     if (cached) return cached;
-    throw new Error("CSV offline nicht verfügbar");
+    throw new Error("CSV offline nicht verf?gbar");
   }
 }
