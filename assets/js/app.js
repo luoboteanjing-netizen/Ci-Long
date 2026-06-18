@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.3.7";
+  window.APP_VERSION = "6.3.8";
 }
 
 
