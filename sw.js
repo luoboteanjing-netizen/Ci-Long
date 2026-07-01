@@ -1,11 +1,11 @@
 // ==========================================
-// Service Worker - Learning App
+// Service Worker – Learning App
 // ==========================================
 
-const APP_CACHE = "flashcards-v6.3.4";
+const APP_CACHE = "flashcards-v6.4.0";
 const CSV_CACHE = "learning-app-csv-v1";
 
-// Statische Dateien (App-Shell)
+// ?? Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
   "./",
   "./index.html",
@@ -13,14 +13,13 @@ const STATIC_ASSETS = [
   "./assets/css/style.css",
   "./assets/js/app.js",
   "./manifest.json",
-  "./assets/img/header.png",
-  "./assets/img/header.webp",
+  "./assets/img/header-dark.webp",
   "./assets/img/header-light.webp",
   "./assets/img/header-warm.webp",
   "./assets/img/header-blue.webp",
   "./icons/icon-192.png",
   "./icons/icon-512.png"
-];
+  ];
 
 // ==========================================
 // INSTALL
@@ -40,11 +39,9 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
-          // Keep current app cache, CSV cache, and any audio caches (fc-audio-*)
-          if (key === APP_CACHE || key === CSV_CACHE || key.startsWith("fc-audio-")) {
-            return;
+          if (![APP_CACHE, CSV_CACHE].includes(key)) {
+            return caches.delete(key);
           }
-          return caches.delete(key);
         })
       )
     )
@@ -61,13 +58,13 @@ self.addEventListener("fetch", event => {
 
   if (req.method !== "GET") return;
 
-  // CSV: Network First (Content aktualisieren)
+  // ? CSV: Network First (Content aktualisieren)
   if (url.endsWith(".csv")) {
     event.respondWith(networkFirstCSV(req));
     return;
   }
 
-  // App-Shell: Cache First (stabil)
+  // ? App-Shell: Cache First (stabil)
   event.respondWith(
     caches.match(req).then(cached => {
       if (cached) return cached;
@@ -93,6 +90,6 @@ async function networkFirstCSV(request) {
   } catch {
     const cached = await cache.match(request);
     if (cached) return cached;
-    throw new Error("CSV offline nicht verfuegbar");
+    throw new Error("CSV offline nicht verfügbar");
   }
 }
