@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.4.0";
+  window.APP_VERSION = "6.4.1";
 }
 
 
@@ -2404,6 +2404,8 @@ function updateVoiceList() {
             btnPick.onclick = () => {
                 state.settings.githubVoiceDe = voiceName;
                 state.settings.githubSpeedDe = 'normal';
+                state.browserVoice.de = null;
+                state.settings.browserVoiceDe = null;
                 saveSettings();
                 closeVoices();
             };
@@ -2491,6 +2493,8 @@ function updateVoiceList() {
             btnPick.onclick = () => {
                 state.settings.githubVoiceZh = voiceName;
                 state.settings.githubSpeedZh = 'slow';
+                state.browserVoice.zh = null;
+                state.settings.browserVoiceZh = null;
                 saveSettings();
                 closeVoices();
             };
