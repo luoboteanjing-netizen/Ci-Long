@@ -1,8 +1,8 @@
 // ==========================================
-// Service Worker – Learning App
+// Service Worker ï¿½ Learning App
 // ==========================================
 
-const APP_CACHE = "flashcards-v6.4.0";
+const APP_CACHE = "flashcards-v6.4.1";
 const CSV_CACHE = "learning-app-csv-v1";
 
 // ?? Statische Dateien (App-Shell)
@@ -90,6 +90,6 @@ async function networkFirstCSV(request) {
   } catch {
     const cached = await cache.match(request);
     if (cached) return cached;
-    throw new Error("CSV offline nicht verfügbar");
+    throw new Error("CSV offline nicht verfï¿½gbar");
   }
 }
