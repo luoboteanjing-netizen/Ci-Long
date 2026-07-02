@@ -384,8 +384,15 @@ const CACHE_PREFIX = 'fc-audio-';
 
 const RELEASE_BASE = 'https://pub-368b54c806bb458385aedf5cd96ac804.r2.dev';
 
-function buildZipUrl(voice) {
-    return `${RELEASE_BASE}/${voice}_slow.zip`;
+/* --- Language-specific audio config lookup --- */
+const AUDIO_LANG_CONFIG = {
+    zh: { base: AUDIO_BASE, defaultSpeed: 'slow',   cacheKey: v => v },
+    de: { base: AUDIO_BASE_DE, defaultSpeed: 'normal', cacheKey: v => 'de-' + v }
+};
+
+function buildZipUrl(voice, lang) {
+    const speed = AUDIO_LANG_CONFIG[lang]?.defaultSpeed || 'slow';
+    return `${RELEASE_BASE}/${voice}_${speed}.zip`;
 }
 
 function sanitizeFileName(fn) {
@@ -396,7 +403,7 @@ function sanitizeFileName(fn) {
     return name;
 }
 
-function buildAudioUrl(entry, voice, speed, kind) {
+function buildAudioUrl(entry, voice, speed, kind, lang = 'zh') {
     if (!entry || !entry.audio) return null;
     let raw = kind === 'words' ? entry.audio.wordFile : entry.audio.sentFile;
     if (!raw) return null;
@@ -408,60 +415,56 @@ function buildAudioUrl(entry, voice, speed, kind) {
     }
     filename = sanitizeFileName(filename);
     if (!filename) return null;
-    return `${AUDIO_BASE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
+    const base = AUDIO_LANG_CONFIG[lang]?.base || AUDIO_BASE;
+    return `${base}/${voice}/${speed}/${encodeURIComponent(filename)}`;
 }
 
+/* Backward-compat wrappers (used by existing callers) */
 function buildAudioUrlDe(entry, voice, speed, kind) {
-    if (!entry || !entry.audio) return null;
-    let raw = kind === 'words' ? entry.audio.wordFile : entry.audio.sentFile;
-    if (!raw) return null;
-    raw = raw.trim();
-    let filename = raw;
-    if (!/\.mp3$/i.test(raw)) {
-        const suffix = kind === 'words' ? '_wrd.mp3' : '_snt.mp3';
-        filename = raw + suffix;
-    }
-    filename = sanitizeFileName(filename);
-    if (!filename) return null;
-    return `${AUDIO_BASE_DE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
+    return buildAudioUrl(entry, voice, speed, kind, 'de');
 }
 
-function playPreviewAudio(voice, speed, kind) {
+function playPreviewAudio(voice, speed, kind, lang = 'zh') {
     const previewEntry = {
         audio: { wordFile: 'L01-1-04_wrd.mp3', sentFile: 'L01-1-04_snt.mp3' }
     };
-    const url = buildAudioUrl(previewEntry, voice, speed, kind);
+    const url = buildAudioUrl(previewEntry, voice, speed, kind, lang);
     if (!url) return;
     const a = new Audio(url);
     a.play().catch(e => console.warn('Play preview failed', e));
 }
 
 function playPreviewAudioDe(voice, speed, kind) {
-    const previewEntry = {
-        audio: { wordFile: 'L01-1-04_wrd.mp3', sentFile: 'L01-1-04_snt.mp3' }
-    };
-    const url = buildAudioUrlDe(previewEntry, voice, speed, kind);
-    if (!url) return;
-    const a = new Audio(url);
-    a.play().catch(e => console.warn('Play DE preview failed', e));
+    playPreviewAudio(voice, speed, kind, 'de');
 }
 
-async function isVoiceCached(voice) {
+async function isVoiceCached(voice, lang = 'zh') {
     try {
-        const cache = await caches.open(CACHE_PREFIX + voice);
+        const key = CACHE_PREFIX + AUDIO_LANG_CONFIG[lang].cacheKey(voice);
+        const cache = await caches.open(key);
         const keys = await cache.keys();
         return keys.length > 0;
     } catch (e) { return false; }
 }
 
-async function deleteVoiceCache(voice) {
+async function isVoiceCachedDe(voice) {
+    return isVoiceCached(voice, 'de');
+}
+
+async function deleteVoiceCache(voice, lang = 'zh') {
     try {
-        await caches.delete(CACHE_PREFIX + voice);
+        const key = CACHE_PREFIX + AUDIO_LANG_CONFIG[lang].cacheKey(voice);
+        await caches.delete(key);
     } catch (e) { console.warn('Cache löschen fehlgeschlagen', e); }
 }
 
-async function downloadVoiceZip(voice, onProgress) {
-    const zipUrl = buildZipUrl(voice);
+async function deleteVoiceCacheDe(voice) {
+    return deleteVoiceCache(voice, 'de');
+}
+
+async function downloadVoiceZip(voice, onProgress, lang = 'zh') {
+    const cfg = AUDIO_LANG_CONFIG[lang];
+    const zipUrl = buildZipUrl(voice, lang);
     onProgress && onProgress(0, 'Verbinde…');
     let response;
     try { response = await fetch(zipUrl); }
@@ -500,13 +503,14 @@ async function downloadVoiceZip(voice, onProgress) {
     const unzipped = await new Promise((resolve, reject) => {
         window._fflate.unzip(zipBuffer, (err, result) => { if (err) reject(err); else resolve(result); });
     });
-    const cache = await caches.open(CACHE_PREFIX + voice);
+    const cacheKey = CACHE_PREFIX + cfg.cacheKey(voice);
+    const cache = await caches.open(cacheKey);
     const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
     const fileCount = files.length;
     let done = 0;
     for (const [zipPath, data] of files) {
         const filename = zipPath.split('/').pop();
-        const cacheUrl = AUDIO_BASE + '/' + voice + '/slow/' + encodeURIComponent(filename);
+        const cacheUrl = cfg.base + '/' + voice + '/' + cfg.defaultSpeed + '/' + encodeURIComponent(filename);
         const blob = new Blob([data], { type: 'audio/mpeg' });
         await cache.put(cacheUrl, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg' } }));
         done++;
@@ -519,75 +523,7 @@ async function downloadVoiceZip(voice, onProgress) {
 }
 
 async function downloadVoiceZipDe(voice, onProgress) {
-    const zipUrl = `${RELEASE_BASE}/${voice}_normal.zip`;
-    onProgress && onProgress(0, 'Verbinde…');
-    let response;
-    try { response = await fetch(zipUrl); }
-    catch (e) { throw new Error('Netzwerkfehler: ' + e.message); }
-    if (!response.ok) throw new Error('ZIP nicht gefunden (' + response.status + '): ' + zipUrl);
-
-    const contentLength = response.headers.get('Content-Length');
-    const total = contentLength ? parseInt(contentLength, 10) : null;
-    let received = 0;
-    const chunks = [];
-    const reader = response.body.getReader();
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        received += value.length;
-        const mb = Math.round(received / 1024 / 1024 * 10) / 10;
-        if (total) onProgress && onProgress(Math.round(received / total * 60), 'Herunterladen… ' + mb + ' MB');
-        else onProgress && onProgress(10, 'Herunterladen… ' + mb + ' MB');
-    }
-    const zipBuffer = new Uint8Array(received);
-    let offset = 0;
-    for (const chunk of chunks) { zipBuffer.set(chunk, offset); offset += chunk.length; }
-    onProgress && onProgress(62, 'Entpacke ZIP…');
-
-    if (!window._fflate) {
-        await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
-            s.onload = resolve;
-            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden'));
-            document.head.appendChild(s);
-        });
-        window._fflate = fflate;
-    }
-    const unzipped = await new Promise((resolve, reject) => {
-        window._fflate.unzip(zipBuffer, (err, result) => { if (err) reject(err); else resolve(result); });
-    });
-    const cache = await caches.open(CACHE_PREFIX + 'de-' + voice);
-    const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
-    const fileCount = files.length;
-    let done = 0;
-    for (const [zipPath, data] of files) {
-        const filename = zipPath.split('/').pop();
-        const cacheUrl = AUDIO_BASE_DE + '/' + voice + '/normal/' + encodeURIComponent(filename);
-        const blob = new Blob([data], { type: 'audio/mpeg' });
-        await cache.put(cacheUrl, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg' } }));
-        done++;
-        if (done % 100 === 0 || done === fileCount) {
-            onProgress && onProgress(62 + Math.round(done / fileCount * 38), 'Speichere… ' + done + ' / ' + fileCount + ' Dateien');
-        }
-    }
-    onProgress && onProgress(100, 'Fertig! ' + fileCount + ' Dateien gespeichert.');
-    return fileCount;
-}
-
-async function isVoiceCachedDe(voice) {
-    try {
-        const cache = await caches.open(CACHE_PREFIX + 'de-' + voice);
-        const keys = await cache.keys();
-        return keys.length > 0;
-    } catch (e) { return false; }
-}
-
-async function deleteVoiceCacheDe(voice) {
-    try {
-        await caches.delete(CACHE_PREFIX + 'de-' + voice);
-    } catch (e) { console.warn('DE Cache löschen fehlgeschlagen', e); }
+    return downloadVoiceZip(voice, onProgress, 'de');
 }
 
 async function playAudioResource(url) {
@@ -622,6 +558,7 @@ const state = {
 
     lessons: new Map(),
     lessonOrder: [],
+    originalLessonOrder: [],   // preserved CSV import order (never sorted)
     selectedLessons: new Set(),
 
     pool: [],
@@ -856,6 +793,8 @@ async function loadCSV() {
         const text = new TextDecoder("utf-8").decode(buf);
 
         parseCSV(text);
+        // Save the original order so we can restore it without re-fetching
+        state.originalLessonOrder = [...state.lessonOrder];
         populateLessonSelect();
     } catch (e) {
 alert(translate("csvLoadError"));
@@ -1057,9 +996,11 @@ document.addEventListener("click", (ev) => {
     const sortKey = ev.target.dataset.sort;
     if (!sortKey) return;
 
-    // ✅ Beim Klick auf "Lektion" → original CSV-Reihenfolge wiederherstellen
+    // Beim Klick auf "Lektion" → original CSV-Reihenfolge wiederherstellen (ohne Netzwerk-Request)
     if (sortKey === "lesson") {
-        loadCSV();      // CSV neu laden = Reihenfolge exakt wie importiert
+        state.lessonOrder = [...state.originalLessonOrder];
+        lessonSort = { key: null, asc: true };
+        populateLessonSelect();
         return;
     }
 
@@ -1738,19 +1679,16 @@ function rate(mark) {
     p.box = 1;
     p.timesWrong++;
 
-    // 🔥 NEU: Karte verzögert wieder einplanen
-    const delay = Math.floor(Math.random() * 6) + 3; // 3–8 Karten
+    // Karte verzögert wieder einplanen (3–8 Karten später)
+    const REINSERT_MIN = 3;
+    const REINSERT_MAX = 8;
+    const delay = Math.floor(Math.random() * (REINSERT_MAX - REINSERT_MIN + 1)) + REINSERT_MIN;
 
     state.reinsertQueue.push({
         card: state.current,
         due: state.cardCounter + delay
     });
 }
-    else if (mark === "unknown") {
-        // falsch → zurück zu 1
-        p.box = 1;
-        p.timesWrong++;
-    }
 
     p.lastReview = Date.now();
     saveProgress();
@@ -3045,15 +2983,6 @@ function renderModeUI() {
 
 window.addEventListener("DOMContentLoaded", () => {
 
-/* ================================
-   Asset-Versionierung aktivieren
-   ================================ */
-const css = document.querySelector("#cssMain");
-const js  = document.querySelector("#jsMain");
-
-if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
-if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
-
 console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
 
     /* ============================================================
@@ -3632,6 +3561,51 @@ if (uiLangSelect) {
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
 })();
+
+/* ============================================================
+   KEYBOARD SHORTCUTS (Training & Browse)
+   Space = Reveal, Arrow keys = Nav, 1 = Didn't know, 2 = Knew it
+   ============================================================ */
+document.addEventListener("keydown", (e) => {
+    // Don't trigger shortcuts when typing in an input/textarea/select
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+    // Only active during training or browse mode, not during autoplay
+    if (!state.trainingOn && !state.browseMode) return;
+    if (state.autoplay.on) return;
+
+    switch (e.key) {
+        case " ":       // Space → Reveal answer
+            e.preventDefault();
+            if (!$("#btnReveal").disabled && $("#solBox").classList.contains("masked")) {
+                doReveal();
+            }
+            break;
+
+        case "ArrowRight":  // → Next card
+            e.preventDefault();
+            if (state.pool.length > 0) nextCard();
+            break;
+
+        case "ArrowLeft":   // ← Previous card
+            e.preventDefault();
+            if (state.historyPos > 0) prevCard();
+            break;
+
+        case "1":       // 1 → Didn't know
+            if (!$("#btnRateUnknown").disabled && $("#rateBar").style.display !== "none") {
+                rate("unknown");
+            }
+            break;
+
+        case "2":       // 2 → Knew it
+            if (!$("#btnRateKnown").disabled && $("#rateBar").style.display !== "none") {
+                rate("known");
+            }
+            break;
+    }
+});
 
 /* ============================================================
    SWIPE-NAVIGATION FÜR KARTEN (Browse & Training)
