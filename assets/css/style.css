@@ -237,7 +237,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     width: 100%;
-    margin-top: 1px;
+    margin-top: 14px;
     align-items: stretch;
 }
 /* NEU: Autoplay als Primary (wenn Klasse hinzugefügt): Farblich identisch zum Training-Button */
@@ -466,6 +466,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 .voice-config > *:first-child { /* Erstes Element in der Config (z.B. Label "ZH Tempo") */
  margin-top: 12px; /* Mehr Abstand zum Button darüber – das macht den Unterschied */
+}
+/* Kein Extra-Abstand in der Timing-Zeile (Gap/Delay) – dort ist kein Button darüber */
+.two-col:not(.voice-grids) > .voice-config > *:first-child {
+ margin-top: 0;
 }
 /* Kleinerer Abstand der Labels zu den Sliders (ZH und DE) */
 .voice-config .lbl { /* Überschreibt den globalen .lbl-Margin */
