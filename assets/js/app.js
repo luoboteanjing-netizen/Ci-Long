@@ -84,7 +84,7 @@ const TRANSLATIONS = {
         themeLightOrange: "Light‑Orange",
         themeLightWarm: "Light‑Warm",
         themeLightBlue: "Light‑Blue",
-        delayLabel: "⏱ Satz‑Delay (Sekunden):",
+        delayLabel: "Pause zw. Wort und Satz:",
         autoplayGapLabel: "Pause zw. Karten im Autoplay:",
         settingsVersion: "Version:",
         modeSwitchTitle: "Richtung umschalten",
