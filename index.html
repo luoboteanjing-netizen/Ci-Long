@@ -102,11 +102,6 @@
         </div>
 
 
-        <div class="menu-block">
-            <label class="lbl" id="gapLabel" data-i18n="delayLabel">Satz‑Delay (Sekunden):</label>
-            <input id="delayInput" type="number" min="0" max="15" step="0.5" value="5" class="menu-input">
-        </div>
-		
 		<a href="help.html" target="_blank" rel="noopener">
 		  📘 Hilfe
 		</a>
@@ -195,12 +190,21 @@
             </div>
 
 			
-            <div class="mt8 gap-row">
-                <label class="lbl" data-i18n="autoplayGapLabel">
-                    Pause zw. Karten im Autoplay:
-                    <span id="gapVal" class="hint">(0.8 s)</span>
-                </label>
-                <input id="gapRange" type="range" min="0.6" max="2.5" step="0.1" value="0.8">
+            <div class="two-col mt8">
+                <div class="voice-config">
+                    <label class="lbl" data-i18n="autoplayGapLabel">
+                        Pause zw. Karten im Autoplay:
+                        <span id="gapVal" class="hint">(0.8 s)</span>
+                    </label>
+                    <input id="gapRange" class="voice-range" type="range" min="0.6" max="2.5" step="0.1" value="0.8">
+                </div>
+                <div class="voice-config">
+                    <label class="lbl" data-i18n="delayLabel">
+                        Satz‑Delay (Sekunden):
+                        <span id="delayVal" class="hint">(3.0 s)</span>
+                    </label>
+                    <input id="delayRange" class="voice-range" type="range" min="0" max="15" step="0.5" value="3">
+                </div>
             </div>
 			
 			

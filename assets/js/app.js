@@ -3052,8 +3052,14 @@ if (installButton) {
         state.sentenceDelay = state.settings.sentenceDelay;
     }
 
-    const delayInput = document.querySelector("#delayInput");
-    if (delayInput) delayInput.value = state.sentenceDelay / 1000;
+    const delayRange = document.querySelector("#delayRange");
+    const delayVal = document.querySelector("#delayVal");
+    if (delayRange) {
+        delayRange.value = state.sentenceDelay / 1000;
+    }
+    if (delayVal) {
+        delayVal.textContent = `(${(state.sentenceDelay / 1000).toFixed(1)} s)`;
+    }
 
     // MODE, ORDER & DISPLAY TOGGLES
     state.mode      = state.settings.mode  || "de2zh";
@@ -3156,12 +3162,13 @@ if (uiLangSelect) {
     });
 }
   
-    /* DELAY INPUT */
-    if (delayInput) {
-        delayInput.addEventListener("input", (e) => {
+    /* DELAY RANGE SLIDER */
+    if (delayRange) {
+        delayRange.addEventListener("input", (e) => {
             const seconds = parseFloat(e.target.value) || 0;
             state.sentenceDelay = seconds * 1000;
             state.settings.sentenceDelay = state.sentenceDelay;
+            if (delayVal) delayVal.textContent = `(${seconds.toFixed(1)} s)`;
             saveSettings();
         });
     }
