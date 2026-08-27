@@ -1439,10 +1439,16 @@ function setCard(entry, fromHistory = false) {
 	
 	if (state.browseMode) {
 
+    // Cancel the delayed sentence timer – browse shows everything immediately
+    if (state.delayedSentenceTimer) {
+        clearTimeout(state.delayedSentenceTimer);
+        state.delayedSentenceTimer = null;
+    }
+
     if (state.mode === "zh2de") {
 
-        renderPromptWordFull(entry);
-        renderPromptSentenceFull(entry);
+        renderPromptWord(entry);       // respects showHanzi/showPinyin
+        renderPromptSentence(entry);   // respects showHanzi/showPinyin
 
     } else {
 
