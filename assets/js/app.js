@@ -736,6 +736,7 @@ function translateAllUI() {
 
     updateTrainingBtn();
     updateAutoplayBtn();
+    updateBrowseBtn();
 }
 
 function updateSearchPlaceholder() {
@@ -1918,6 +1919,11 @@ function updateTrainingBtn() {
         state.trainingOn ? translate("trainingStop") : translate("trainingStart");
 }
 
+function updateBrowseBtn() {
+    $("#btnBrowse").textContent =
+        state.browseMode ? translate("browseStop") : translate("browseStart");
+}
+
 function updateModeButtons() {
 
     $("#btnStart").classList.remove("active-mode");
@@ -1935,6 +1941,8 @@ function updateModeButtons() {
     if (state.autoplay.on) {
         $("#btnAutoplay").classList.add("active-mode");
     }
+
+    updateBrowseBtn();
 }
 
 /* ========================================================================== */
