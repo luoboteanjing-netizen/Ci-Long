@@ -1,5 +1,5 @@
 ﻿Wort Deutsch;Wort Pinyin ;Wortart;Satz Pinyin;Satz Deutsch;Wort Hanyu;Satz Hanyu;ID;Lektion
-* Lektion 0 -2026-10-05;*Lektion 0;* Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;L00-1-00;L00 - Vokabeln Unterricht
+* Lektion 0 -2026-10-06;*Lektion 0;* Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;L00-1-00;L00 - Vokabeln Unterricht
 öffnen;dǎkāi;Verb;qǐng dǎkāi shū.;Bitte öffnen Sie das Buch.;打开;请打开书。;L00-1-01;L00 - Vokabeln Unterricht
 sprechen (vorlesen);niàn;Verb;gēn wǒ niàn.;Sprechen Sie mir nach.;念;跟我念。;L00-1-02;L00 - Vokabeln Unterricht
 Text / Lektionstext;kè wén;Nomen.;qǐng niàn kè wén.;Lesen Sie den Text.;课文;请念课文。;L00-1-03;L00 - Vokabeln Unterricht
@@ -634,7 +634,7 @@ Der Bund (in Shanghai);Wàitān;Eigenname;Wǒ qù Wàitān.;Ich gehe zum Bund (S
 ;;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern Bus.;;我不喜欢坐公车。;L08-D-09;L08 - Dialog    Fortbewegung, Verkehrsmittel
 ;;;Gōngchē lǐ rén tài duō le.;Im Bus gibt es zu viele Menschen.;;公车里人太多了。;L08-D-10;L08 - Dialog    Fortbewegung, Verkehrsmittel
 ;;;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin, und fahr mit dem Taxi nach Hause, was meinst du?;;那么，你走路去，打的回家，怎么样？;L08-D-11;L08 - Dialog    Fortbewegung, Verkehrsmittel
-* Lektion 9;*Lektion 9;* Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;L09-1-00;L09 - Vokabeln
+* Lektion 9;*Lektion 9;* Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;L09-1-00;L09 - Vokabeln Lebensmittel, Kleidung
 tragen (Kleidung);chuān;Verb;Jīntiān tā chuān zhuó máoyī.;Heute trägt sie einen Pullover.;穿;今天她穿着毛衣。 ;L09-1-01;L09 - Vokabeln Lebensmittel, Kleidung
 gerade (Partikel);zhe;Partikel;;;着;;L09-1-02;L09 - Vokabeln Lebensmittel, Kleidung
 blau;lánsè;Nomen;;;蓝色;;L09-1-03;L09 - Vokabeln Lebensmittel, Kleidung
@@ -675,6 +675,21 @@ suchen;zhǎo;Verb;;;找;;L09-1-37;L09 - Vokabeln Lebensmittel, Kleidung
 Tomate;xīhóngshì;Nomen;;;西红柿;;L09-1-38;L09 - Vokabeln Lebensmittel, Kleidung
 Traube;pútao;Nomen;;;葡萄;;L09-1-39;L09 - Vokabeln Lebensmittel, Kleidung
 Verkäufer;shòuhuòyuán;Nomen;;;售货员;;L09-1-40;L09 - Vokabeln Lebensmittel, Kleidung
+* Lektion 9;*Lektion 9;* Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;L09-2-00;L09 - Farben
+Farbe;yánsè;Nomen;Nǐ xǐhuan shénme yánsè?;Welche Farbe magst du?;颜色;你喜欢什么颜色？;L09-2-01;L09 - Farben
+weiß;báisè;Nomen;Zhè jiàn yīfu shì báisè de.;Dieses Kleidungsstück ist weiß.;白色;这件衣服是白色的。;L09-2-02;L09 - Farben
+gelb;huángsè;Nomen;Xiāngjiāo shì huángsè de.;Die Banane ist gelb.;黄色;香蕉是黄色的。;L09-2-03;L09 - Farben
+rot;hóngsè;Nomen;Píngguǒ shì hóngsè de.;Der Apfel ist rot.;红色;苹果是红色的。;L09-2-04;L09 - Farben
+blau;lánsè;Nomen;Tiānkōng shì lánsè de.;Der Himmel ist blau.;蓝色;天空是蓝色的。;L09-2-05;L09 - Farben
+grün;lǜsè;Nomen;Cǎo shì lǜsè de.;Das Gras ist grün.;绿色;草是绿色的。;L09-2-06;L09 - Farben
+braun;zōngsè;Nomen;Zhè zhāng zhuōzi shì zōngsè de.;Dieser Tisch ist braun.;棕色;这张桌子是棕色的。;L09-2-07;L09 - Farben
+schwarz;hēisè;Nomen;Tā chuān hēisè de kùzi.;Er/Sie trägt eine schwarze Hose.;黑色;他穿黑色的裤子。;L09-2-08;L09 - Farben
+orange;chéngsè;Nomen;Zhè ge júzi shì chéngsè de.;Diese Orange ist orange.;橙色;这个橘子是橙色的。;L09-2-09;L09 - Farben
+lila / violett;zǐsè;Nomen;Tā xǐhuan zǐsè de huā.;Sie mag lila Blumen.;紫色;她喜欢紫色的花。;L09-2-10;L09 - Farben
+rosa / pink;fěnsè;Nomen;Zhè jiàn qúnzi shì fěnsè de.;Dieser Rock ist rosa.;粉色;这件裙子是粉色的。;L09-2-11;L09 - Farben
+grau;huīsè;Nomen;Tiānqì hěn huīsè.;Das Wetter ist sehr grau.;灰色;天气很灰色。;L09-2-12;L09 - Farben
+gold;jīnsè;Nomen;Tā dài zhe jīnsè de ěrhuán.;Sie trägt goldene Ohrringe.;金色;她戴着金色的耳环。;L09-2-13;L09 - Farben
+silber;yínsè;Nomen;Zhè ge shǒubiǎo shì yínsè de.;Diese Uhr ist silbern.;银色;这个手表是银色的。;L09-2-14;L09 - Farben
 * Lektion 10;*Lektion 10;* Lektion 10;*Lektion 10;*Lektion 10;*Lektion 10;*Lektion 10;L10-1-00;L10 - Vokabeln
 alle;dàjiā;Nomen;;;大家;;L10-1-01;L10 - Vokabeln
 antworten;huídá;Verb;;;回答;;L10-1-02;L10 - Vokabeln
