@@ -99,7 +99,6 @@ function scrollToBottom() {
         top: document.body.scrollHeight,
         behavior: "smooth"
     });
-	console.log("SCROLL bottom");
 });
 }
 
@@ -109,7 +108,6 @@ function scrollToTop() {
         top: 0,
         behavior: "smooth"
     });
-	console.log("SCROLL TOP");
 });
 }
 

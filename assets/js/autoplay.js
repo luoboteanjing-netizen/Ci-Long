@@ -16,7 +16,6 @@ import { buildAudioUrl, buildAudioUrlDe, playAudioResource, buildUtterance, ttsP
 /* ============================ AUTOPLAY ============================ */
 
 function setAutoplay(on) {
- console.log("setAutoplay called:", on);
     state.autoplay.on = on;
 	updateModeButtons()
     if (!on) {
@@ -289,16 +288,12 @@ function releaseWakeLock() {
 /* ============================ AUTOPLAY SAFETY ============================ */
 
 function stopAutoplayOnUserAction() {
-    console.log("autoplay state:", state.autoplay.on);
-
     if (state.autoplay.on) {
-        console.log("stopping autoplay");
         setAutoplay(false);
         speechSynthesis.cancel();
         state.autoplay.timers.forEach(id => clearTimeout(id));
         state.autoplay.timers = [];
     }
-    console.log("SCROLL TOP");
     scrollToTop();
 }
 

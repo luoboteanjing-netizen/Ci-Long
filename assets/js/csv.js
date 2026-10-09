@@ -254,19 +254,23 @@ document.addEventListener("click", (ev) => {
 
 function getLessonStats(lessonName) {
     const cards = state.lessons.get(lessonName) || [];
-    const total = cards.length;
+    let strong = 0;   // Box 4+5, same as the ✅ column
+    let weak = 0;     // Box 2+3, same as the 🤔 column
+    let unknown = 0;  // Box 1, same as the ❌ column
 
-    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0 };
-    const known = p.known || 0;
-    const unknown = p.unknown || 0;
-    const percent = total ? Math.round((known / total) * 100) : 0;
+    for (const card of cards) {
+        const box = state.progress.cards[card.id]?.box || 0;
+        if (box === 1) unknown++;
+        else if (box === 2 || box === 3) weak++;
+        else if (box === 4 || box === 5) strong++;
+    }
 
     return {
         lesson: lessonName,
-        total,
-        known,
-        unknown,
-        percent
+        total: cards.length,
+        strong,
+        weak,
+        unknown
     };
 }
 
