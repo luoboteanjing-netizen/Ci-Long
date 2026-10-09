@@ -431,6 +431,23 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: var(--color-accent-text) !important;
 }
 .voice-config{display:flex;flex-direction:column;gap:10px}
+.voice-tts-config {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 4px 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+.voice-tts-slider .lbl {
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+.voice-tts-slider .hint {
+    font-size: 12px;
+    font-weight: 500;
+}
 .voice-range{width:100%}
 .ratebar{
   display:flex;

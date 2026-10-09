@@ -485,29 +485,6 @@ if (installButton) {
     };
     setTimeout(refreshVoices, 300); // Fallback
 
-    /* Slider auf gespeicherte Werte setzen */
-    const rateDeRange  = document.querySelector("#rateDeRange");
-    const pitchDeRange = document.querySelector("#pitchDeRange");
-    const rateZhRange  = document.querySelector("#rateZhRange");
-    const pitchZhRange = document.querySelector("#pitchZhRange");
-
-    const rateDeVal  = document.querySelector("#rateDeVal");
-    const pitchDeVal = document.querySelector("#pitchDeVal");
-    const rateZhVal  = document.querySelector("#rateZhVal");
-    const pitchZhVal = document.querySelector("#pitchZhVal");
-
-    if (rateDeRange)  rateDeRange.value  = state.rateDe;
-    if (pitchDeRange) pitchDeRange.value = state.pitchDe;
-    if (rateZhRange)  rateZhRange.value  = state.rateZh;
-    if (pitchZhRange) pitchZhRange.value = state.pitchZh;
-
-    if (rateDeVal)  rateDeVal.textContent  = `(${state.rateDe.toFixed(2)})`;
-    if (pitchDeVal) pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
-    if (rateZhVal)  rateZhVal.textContent  = `(${state.rateZh.toFixed(2)})`;
-    if (pitchZhVal) pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
-
-
- 
  /* ============================================================
    SLIDE-DRAWER (⋮) – Menü öffnen/schließen + Animation
    ============================================================ */
@@ -559,41 +536,6 @@ if (uiLangSelect) {
             saveSettings();
         });
     }
-
-    /* ============================================================
-       STIMMEN-EINSTELLUNG
-       ============================================================ */
-    rateDeRange?.addEventListener("input", (e) => {
-     
-        state.rateDe = parseFloat(e.target.value);
-        state.settings.rateDe = state.rateDe;
-        rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    pitchDeRange?.addEventListener("input", (e) => {
-      
-        state.pitchDe = parseFloat(e.target.value);
-        state.settings.pitchDe = state.pitchDe;
-        pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    rateZhRange?.addEventListener("input", (e) => {
-      
-        state.rateZh = parseFloat(e.target.value);
-        state.settings.rateZh = state.rateZh;
-        rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
-        saveSettings();
-    });
-
-    pitchZhRange?.addEventListener("input", (e) => {
-     
-        state.pitchZh = parseFloat(e.target.value);
-        state.settings.pitchZh = state.pitchZh;
-        pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
-        saveSettings();
-    });
 
     document.querySelector("#btnVoiceDe")?.addEventListener("click", function() {
         this.classList.add("active");

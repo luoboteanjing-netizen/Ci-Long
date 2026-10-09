@@ -278,6 +278,73 @@ function closeVoices() {
 
 /* ============================ UPDATE VOICE LIST ============================ */
 
+function appendBrowserVoiceControls(box) {
+    const isZh = state.voicePanelTarget === "zh";
+    const wrap = document.createElement("div");
+    wrap.className = "voice-tts-config";
+    wrap.appendChild(makeVoiceSlider(
+        translate(isZh ? "rateZhLabel" : "rateDeLabel"),
+        isZh ? state.rateZh : state.rateDe,
+        0.6, 1.6, 0.05,
+        (value) => {
+            if (isZh) {
+                state.rateZh = value;
+                state.settings.rateZh = value;
+            } else {
+                state.rateDe = value;
+                state.settings.rateDe = value;
+            }
+            saveSettings();
+        }
+    ));
+    wrap.appendChild(makeVoiceSlider(
+        translate(isZh ? "pitchZhLabel" : "pitchDeLabel"),
+        isZh ? state.pitchZh : state.pitchDe,
+        0.7, 1.5, 0.05,
+        (value) => {
+            if (isZh) {
+                state.pitchZh = value;
+                state.settings.pitchZh = value;
+            } else {
+                state.pitchDe = value;
+                state.settings.pitchDe = value;
+            }
+            saveSettings();
+        }
+    ));
+    box.appendChild(wrap);
+}
+
+function makeVoiceSlider(labelText, value, min, max, step, onInput) {
+    const block = document.createElement("div");
+    block.className = "voice-tts-slider";
+
+    const label = document.createElement("label");
+    label.className = "lbl";
+    const hint = document.createElement("span");
+    hint.className = "hint";
+    hint.textContent = `(${Number(value).toFixed(2)})`;
+    label.appendChild(document.createTextNode(labelText + " "));
+    label.appendChild(hint);
+
+    const input = document.createElement("input");
+    input.type = "range";
+    input.className = "voice-range";
+    input.min = String(min);
+    input.max = String(max);
+    input.step = String(step);
+    input.value = String(value);
+    input.addEventListener("input", () => {
+        const next = parseFloat(input.value);
+        hint.textContent = `(${next.toFixed(2)})`;
+        onInput(next);
+    });
+
+    block.appendChild(label);
+    block.appendChild(input);
+    return block;
+}
+
 function updateVoiceList() {
     const box = $("#dbgVoices");
     if (!box) return;
@@ -462,6 +529,9 @@ function updateVoiceList() {
         box.appendChild(sep);
     }
 
+    // Tempo und Tonhöhe gelten nur für Browser-TTS, nicht für MP3-Stimmen
+    appendBrowserVoiceControls(box);
+
     // ── Browser-Stimmen (wie bisher) ─────────────────────────
     const list = (state.voices || []).filter(v =>
         state.voicePanelTarget === "zh" ? isZhVoice(v) : isDeVoice(v)
@@ -510,11 +580,14 @@ function updateVoiceList() {
         btnTest.className = "btn ghost";
         btnTest.textContent = translate("testVoice");
         btnTest.onclick = () => {
+            const isZh = state.voicePanelTarget === "zh";
             const u = new SpeechSynthesisUtterance(
-                state.voicePanelTarget === "zh" ? "我很高兴见到你。" : "Es freut mich sehr dich zu sehen."
+                isZh ? "我很高兴见到你。" : "Es freut mich sehr dich zu sehen."
             );
-            u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
+            u.lang = isZh ? "zh-CN" : "de-DE";
             u.voice = v;
+            u.rate = isZh ? state.rateZh : state.rateDe;
+            u.pitch = isZh ? state.pitchZh : state.pitchDe;
             speechSynthesis.cancel();
             speechSynthesis.speak(u);
         };
