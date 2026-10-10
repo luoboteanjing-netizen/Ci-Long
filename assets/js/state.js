@@ -1,5 +1,5 @@
 /* Global state, settings storage, translations */
-export const APP_VERSION = "6.4.6";
+export const APP_VERSION = "7.0.0";
 window.APP_VERSION = APP_VERSION;
 
 const LS_KEYS = {
@@ -38,6 +38,8 @@ const TRANSLATIONS = {
         autoPlayStop: "Autoplay",
         trainingStart: "Training︎",
         trainingStop: "Training",
+        choiceStart: "Auswahl",
+        choiceStop: "Auswahl",
         prev: "◀ Zurück",
         reveal: "Antwort zeigen",
         next: "Nächste ▶",
@@ -114,6 +116,8 @@ const TRANSLATIONS = {
         autoPlayStop: "Autoplay",
         trainingStart: "practice",
         trainingStop: "practice",
+        choiceStart: "Choices",
+        choiceStop: "Choices",
         prev: "◀ Back",
         reveal: "Show answer",
         next: "Next ▶",
@@ -190,6 +194,8 @@ const TRANSLATIONS = {
         autoPlayStop: "自动播放",
         trainingStart: "开始学习",
         trainingStop: "开始学习",
+        choiceStart: "选择",
+        choiceStop: "选择",
         prev: "◀ 上一张",
         reveal: "显示答案",
         next: "下一张 ▶",
@@ -266,6 +272,8 @@ const TRANSLATIONS = {
         autoPlayStop: "lecture auto",
         trainingStart: "exercices",
         trainingStop: "exercices",
+        choiceStart: "Choix",
+        choiceStop: "Choix",
         prev: "◀ Précédent",
         reveal: "Afficher la réponse",
         next: "Suivant ▶",
@@ -396,7 +404,9 @@ const state = {
 
     wakeLock: null,
     trainingOn: false,
-	browseMode: false
+	browseMode: false,
+    choiceMode: false,
+    choiceSelected: null
 };
 
 	state.reinsertQueue = [];

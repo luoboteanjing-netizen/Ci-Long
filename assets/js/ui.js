@@ -21,9 +21,11 @@ import {
     doReveal,
     rate,
     startTraining,
+    startChoice,
     startBrowse,
     renderDisplayToggleUI,
     updateTrainingBtn,
+    updateChoiceBtn,
     updateBrowseBtn,
     updateModeButtons,
     hapticFeedback,
@@ -327,6 +329,7 @@ function translateAllUI() {
     updateTrainingBtn();
     updateAutoplayBtn();
     updateBrowseBtn();
+    updateChoiceBtn();
 }
 
 function updateSearchPlaceholder() {
@@ -675,6 +678,11 @@ if (uiLangSelect) {
         hapticFeedback();
         stopAutoplayOnUserAction();
         startTraining();
+    });
+    $("#btnChoice")?.addEventListener("click", () => {
+        hapticFeedback();
+        stopAutoplayOnUserAction();
+        startChoice();
     });
 	$("#btnBrowse").addEventListener("click", () => {
         hapticFeedback();

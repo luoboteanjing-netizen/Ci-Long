@@ -9,7 +9,8 @@ import {
     hideRatingButtons,
     scrollToTop,
     scrollToBottom,
-    disableRating
+    disableRating,
+    clearChoiceBox
 } from "./card.js";
 import { buildAudioUrl, buildAudioUrlDe, playAudioResource, buildUtterance, ttsPrime } from "./tts.js";
 
@@ -17,6 +18,10 @@ import { buildAudioUrl, buildAudioUrlDe, playAudioResource, buildUtterance, ttsP
 
 function setAutoplay(on) {
     state.autoplay.on = on;
+    if (on) {
+        state.choiceMode = false;
+        clearChoiceBox();
+    }
 	updateModeButtons()
     if (!on) {
         speechSynthesis.cancel();

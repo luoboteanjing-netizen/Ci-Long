@@ -87,6 +87,10 @@ function syncCardHeights() {
 
     q.style.minHeight = "";
     a.style.minHeight = "";
+    q.style.maxHeight = "";
+    a.style.maxHeight = "";
+
+    if (state.choiceMode) return;
 
     const h = Math.max(q.offsetHeight, a.offsetHeight);
     q.style.minHeight = h + "px";
@@ -383,6 +387,187 @@ function setCard(entry, fromHistory = false) {
 
     syncCardHeights();
 	}
+
+    renderChoices(entry);
+}
+
+function choiceAnswerText(entry) {
+    if (!entry) return "—";
+    if (state.mode === "zh2de") {
+        return (entry.word?.de || "").trim() || (entry.sent?.de || "").trim() || "—";
+    }
+
+    const wordZh = (entry.word?.zh || "").trim();
+    const wordPy = (entry.word?.py || "").trim();
+    const hanzi = wordZh || (entry.sent?.zh || "").trim();
+    const pinyin = wordZh ? wordPy : (entry.sent?.py || "").trim();
+    const parts = [];
+    if (state.showHanzi !== false && hanzi) parts.push(hanzi);
+    if (state.showPinyin !== false && pinyin) parts.push(pinyin);
+    return parts.join(" ") || hanzi || pinyin || "—";
+}
+
+function buildChoiceOptions(entry) {
+    const correctText = choiceAnswerText(entry);
+    const sameLesson = state.lessons.get(entry.lesson) || [];
+    const rest = [];
+    for (const cards of state.lessons.values()) {
+        if (cards !== sameLesson) rest.push(...cards);
+    }
+    const candidates = [...sameLesson, ...rest].filter((card) => card.id !== entry.id);
+    for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+
+    const used = new Set([correctText]);
+    const picked = [entry];
+    for (const card of candidates) {
+        const text = choiceAnswerText(card);
+        if (!text || text === "—" || used.has(text)) continue;
+        used.add(text);
+        picked.push(card);
+        if (picked.length === 4) break;
+    }
+
+    for (let i = picked.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [picked[i], picked[j]] = [picked[j], picked[i]];
+    }
+    return picked;
+}
+
+function setChoiceLayout(on) {
+    document.querySelector("#learnSection")?.classList.toggle("choice-active", !!on);
+}
+
+function clearChoiceBox() {
+    const box = $("#choiceBox");
+    if (box) {
+        box.innerHTML = "";
+        box.hidden = true;
+    }
+    const speaker = $("#speakerAnswer");
+    if (speaker) speaker.style.visibility = "";
+    setChoiceLayout(false);
+}
+
+function selectChoice(id) {
+    if (!state.choiceMode || state.revealedAt) return;
+    state.choiceSelected = id;
+    document.querySelectorAll(".choice-btn").forEach((btn) => {
+        btn.classList.toggle("selected", btn.dataset.choiceId === id);
+    });
+}
+
+function renderChoices(entry) {
+    const box = $("#choiceBox");
+    if (!box) return;
+    if (!state.choiceMode || !entry) {
+        clearChoiceBox();
+        return;
+    }
+
+    state.choiceSelected = null;
+    setChoiceLayout(true);
+    box.hidden = false;
+    box.innerHTML = "";
+    buildChoiceOptions(entry).forEach((card) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "choice-btn";
+        btn.dataset.choiceId = card.id;
+        btn.textContent = choiceAnswerText(card);
+        btn.addEventListener("click", () => selectChoice(card.id));
+        box.appendChild(btn);
+    });
+
+    const speaker = $("#speakerAnswer");
+    if (speaker) speaker.style.visibility = "hidden";
+    syncCardHeights();
+}
+
+function appendZhBlock(el, zh, py) {
+    const hz = (zh || "").trim();
+    const pinyin = (py || "").trim();
+    if (hz) el.appendChild(document.createTextNode(hz));
+    if (pinyin) {
+        if (hz) el.appendChild(document.createElement("br"));
+        const span = document.createElement("span");
+        span.className = "zh-pinyin";
+        span.textContent = pinyin;
+        el.appendChild(span);
+    }
+}
+
+function choiceRevealNodes(entry) {
+    const nodes = [];
+    const posText = (entry.pos || "").trim();
+    const answer = document.createElement("span");
+    answer.className = "choice-answer";
+    const sent = document.createElement("span");
+    sent.className = "choice-sent";
+
+    if (state.mode === "zh2de") {
+        const word = (entry.word?.de || "").trim();
+        const sentence = (entry.sent?.de || "").trim();
+        if (word) answer.textContent = word;
+        if (sentence) sent.textContent = sentence;
+    } else {
+        appendZhBlock(answer, entry.word?.zh, entry.word?.py);
+        appendZhBlock(sent, entry.sent?.zh, entry.sent?.py);
+    }
+
+    if (answer.childNodes.length || answer.textContent) nodes.push(answer);
+    if (posText) {
+        const pos = document.createElement("span");
+        pos.className = "choice-pos";
+        pos.textContent = posText;
+        nodes.push(pos);
+    }
+    if (sent.childNodes.length || sent.textContent) nodes.push(sent);
+    if (!nodes.length) {
+        answer.textContent = "—";
+        nodes.push(answer);
+    }
+    return nodes;
+}
+
+function scrollChoiceIntoView(btn) {
+    const box = document.querySelector("#solBox");
+    if (!box || !btn) return;
+    const top = btn.offsetTop;
+    const bottom = top + btn.offsetHeight;
+    const viewBottom = box.scrollTop + box.clientHeight;
+    if (bottom > viewBottom - 8) {
+        box.scrollTop = bottom - box.clientHeight + 12;
+    } else if (top < box.scrollTop) {
+        box.scrollTop = Math.max(0, top - 8);
+    }
+}
+
+function expandCorrectChoice(entry) {
+    if (!entry) return;
+    const btn = [...document.querySelectorAll(".choice-btn")]
+        .find((item) => item.dataset.choiceId === entry.id);
+    if (!btn) return;
+    btn.classList.add("correct", "expanded");
+    btn.replaceChildren(...choiceRevealNodes(entry));
+    requestAnimationFrame(() => scrollChoiceIntoView(btn));
+}
+
+function gradeChoices() {
+    const selected = state.choiceSelected;
+    const correct = state.current?.id;
+    document.querySelectorAll(".choice-btn").forEach((btn) => {
+        btn.disabled = true;
+        if (selected && btn.dataset.choiceId === selected && selected !== correct) {
+            btn.classList.add("wrong");
+        }
+    });
+    expandCorrectChoice(state.current);
+    const speaker = $("#speakerAnswer");
+    if (speaker) speaker.style.visibility = "";
 }
 
 /* ============================ HISTORY / NAV ============================ */
@@ -470,6 +655,8 @@ function showNavButtons() {
 	} else {
 
 		$("#btnReveal").style.display = "";
+		$("#btnReveal").style.visibility = "";
+		$("#btnReveal").style.pointerEvents = "";
 
 	}
 
@@ -543,10 +730,31 @@ if (state.delayedSentenceTimer) {
     // -----------------------------------------
     // Buttons anzeigen
     // -----------------------------------------
-    if (!state.autoplay.on) hideNavButtons();
-    showRatingButtons();
-    enableRating();
+    if (state.choiceMode) {
+        gradeChoices();
+        applyRating(null, { advance: false });
+        hideRatingButtons();
+        $("#btnPrev").style.display = "";
+        $("#btnNext").style.display = "";
+        const revealBtn = $("#btnReveal");
+        if (revealBtn) {
+            revealBtn.disabled = true;
+            revealBtn.style.visibility = "hidden";
+            revealBtn.style.pointerEvents = "none";
+        }
+        refreshCardLeitner();
+    } else {
+        if (!state.autoplay.on) hideNavButtons();
+        showRatingButtons();
+        enableRating();
+    }
     syncCardHeights();
+}
+
+function refreshCardLeitner() {
+    const asciiEl = document.querySelector("#cardTitle .leitner-ascii");
+    if (!asciiEl || !state.current) return;
+    asciiEl.textContent = getLeitnerAscii(ensureCardProgress(state.current).box);
 }
 
 function showRatingButtons() {
@@ -559,6 +767,12 @@ function hideRatingButtons() {
 }
 
 function enableRating() {
+    if (state.choiceMode) {
+        const correct = !!state.choiceSelected && state.choiceSelected === state.current?.id;
+        $("#btnRateKnown").disabled = !correct;
+        $("#btnRateUnknown").disabled = correct;
+        return;
+    }
     $("#btnRateKnown").disabled = false;
   
     $("#btnRateUnknown").disabled = false;
@@ -571,8 +785,15 @@ function disableRating() {
 }
 
 function rate(mark) {
+    applyRating(mark, { advance: true });
+}
+
+function applyRating(mark, { advance = true } = {}) {
     if (!state.current) return;
-    hapticFeedback();
+    if (state.choiceMode) {
+        mark = state.choiceSelected === state.current.id ? "known" : "unknown";
+    }
+    if (advance) hapticFeedback();
 
     // -----------------------------------------
     // LEITNER: Bewertung
@@ -633,13 +854,20 @@ function rate(mark) {
 
     disableRating();
     hideRatingButtons();
+    if (!advance) return;
     showNavButtons();
     nextCard();
 }
 
 /* ============================ TRAINING ============================ */
 
+let startAsChoice = false;
+
 function startTraining() {
+    if (!startAsChoice && state.choiceMode) {
+        state.choiceMode = false;
+        state.trainingOn = false;
+    }
 
     if (!state.trainingOn) {
 
@@ -667,6 +895,8 @@ function startTraining() {
 
         if (!state.pool.length) {
             alert(translate("selectLessonAlert"));
+            startAsChoice = false;
+            state.choiceMode = false;
             return;
         }
 
@@ -717,6 +947,8 @@ function startTraining() {
         // ----------------------------
         // ✅ Erste Karte setzen
         // ----------------------------
+        state.choiceMode = startAsChoice;
+        startAsChoice = false;
         setCard(state.pool[state.idx]);
 
         // ----------------------------
@@ -735,8 +967,21 @@ function startTraining() {
         scrollToBottom();
 
     } else {
+        startAsChoice = false;
         stopTraining();
     }
+}
+
+function startChoice() {
+    if (state.choiceMode) {
+        stopTraining();
+        return;
+    }
+    state.stopAutoplayOnUserAction?.();
+    if (state.browseMode) state.browseMode = false;
+    if (state.trainingOn) state.trainingOn = false;
+    startAsChoice = true;
+    startTraining();
 }
 
 function startBrowse() {
@@ -745,6 +990,8 @@ function startBrowse() {
 
         state.stopAutoplayOnUserAction?.();
         state.trainingOn = false;
+        state.choiceMode = false;
+        clearChoiceBox();
         state.browseMode = true;
 
         state.history = [];
@@ -787,6 +1034,9 @@ function startBrowse() {
 
 function stopTraining() {
     state.trainingOn = false;
+    state.choiceMode = false;
+    state.choiceSelected = null;
+    clearChoiceBox();
 	
 	// ✅ Resume-Index der aktuellen Lektion speichern (Training + Autoplay)
 if (state.current && state.current.lesson && state.idx !== null) {
@@ -825,8 +1075,15 @@ function stopBrowse() {
 }
 
 function updateTrainingBtn() {
+    const trainingActive = state.trainingOn && !state.choiceMode;
     $("#btnStart").textContent =
-        state.trainingOn ? translate("trainingStop") : translate("trainingStart");
+        trainingActive ? translate("trainingStop") : translate("trainingStart");
+}
+
+function updateChoiceBtn() {
+    const btn = $("#btnChoice");
+    if (!btn) return;
+    btn.textContent = state.choiceMode ? translate("choiceStop") : translate("choiceStart");
 }
 
 function updateBrowseBtn() {
@@ -839,8 +1096,9 @@ function updateModeButtons() {
     $("#btnStart").classList.remove("active-mode");
     $("#btnBrowse").classList.remove("active-mode");
     $("#btnAutoplay").classList.remove("active-mode");
+    $("#btnChoice")?.classList.remove("active-mode");
 
-    if (state.trainingOn) {
+    if (state.trainingOn && !state.choiceMode) {
         $("#btnStart").classList.add("active-mode");
     }
 
@@ -852,10 +1110,19 @@ function updateModeButtons() {
         $("#btnAutoplay").classList.add("active-mode");
     }
 
+    if (state.choiceMode) {
+        $("#btnChoice")?.classList.add("active-mode");
+    }
+
     updateBrowseBtn();
+    updateChoiceBtn();
 }
 
 state.setCard = setCard;
+
+window.addEventListener("resize", () => {
+    if (state.choiceMode) syncCardHeights();
+});
 
 
 export {
@@ -886,10 +1153,13 @@ export {
     disableRating,
     rate,
     startTraining,
+    startChoice,
     startBrowse,
     stopTraining,
     stopBrowse,
     updateTrainingBtn,
+    updateChoiceBtn,
     updateBrowseBtn,
+    clearChoiceBox,
     updateModeButtons
 };
