@@ -1,5 +1,5 @@
 /* Global state, settings storage, translations */
-export const APP_VERSION = "7.0.0";
+export const APP_VERSION = "7.0.1";
 window.APP_VERSION = APP_VERSION;
 
 const LS_KEYS = {

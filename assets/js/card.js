@@ -441,13 +441,21 @@ function setChoiceLayout(on) {
     document.querySelector("#learnSection")?.classList.toggle("choice-active", !!on);
 }
 
+function parkAnswerSpeaker() {
+    const speaker = $("#speakerAnswer");
+    const home = document.querySelector("#solSent")?.parentElement;
+    if (!speaker || !home) return speaker;
+    if (speaker.parentElement !== home) home.appendChild(speaker);
+    return speaker;
+}
+
 function clearChoiceBox() {
+    const speaker = parkAnswerSpeaker();
     const box = $("#choiceBox");
     if (box) {
         box.innerHTML = "";
         box.hidden = true;
     }
-    const speaker = $("#speakerAnswer");
     if (speaker) speaker.style.visibility = "";
     setChoiceLayout(false);
 }
@@ -471,6 +479,7 @@ function renderChoices(entry) {
     state.choiceSelected = null;
     setChoiceLayout(true);
     box.hidden = false;
+    const speaker = parkAnswerSpeaker();
     box.innerHTML = "";
     buildChoiceOptions(entry).forEach((card) => {
         const btn = document.createElement("button");
@@ -482,7 +491,6 @@ function renderChoices(entry) {
         box.appendChild(btn);
     });
 
-    const speaker = $("#speakerAnswer");
     if (speaker) speaker.style.visibility = "hidden";
     syncCardHeights();
 }
@@ -552,7 +560,13 @@ function expandCorrectChoice(entry) {
         .find((item) => item.dataset.choiceId === entry.id);
     if (!btn) return;
     btn.classList.add("correct", "expanded");
+    btn.disabled = false;
     btn.replaceChildren(...choiceRevealNodes(entry));
+    const speaker = $("#speakerAnswer");
+    if (speaker) {
+        btn.appendChild(speaker);
+        speaker.style.visibility = "";
+    }
     requestAnimationFrame(() => scrollChoiceIntoView(btn));
 }
 
@@ -560,14 +574,12 @@ function gradeChoices() {
     const selected = state.choiceSelected;
     const correct = state.current?.id;
     document.querySelectorAll(".choice-btn").forEach((btn) => {
-        btn.disabled = true;
+        btn.disabled = btn.dataset.choiceId !== correct;
         if (selected && btn.dataset.choiceId === selected && selected !== correct) {
             btn.classList.add("wrong");
         }
     });
     expandCorrectChoice(state.current);
-    const speaker = $("#speakerAnswer");
-    if (speaker) speaker.style.visibility = "";
 }
 
 /* ============================ HISTORY / NAV ============================ */

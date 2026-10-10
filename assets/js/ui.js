@@ -711,8 +711,8 @@ if (uiLangSelect) {
         playQuestion();
     });
 
-    $("#speakerAnswer").addEventListener("click", () => {
-     
+    $("#speakerAnswer").addEventListener("click", (e) => {
+        e.stopPropagation();
         playAnswer();
     });
 
