@@ -374,10 +374,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #learnSection.choice-active #solBox .sol-text {
   display: none;
 }
-#learnSection.choice-active #choiceBox:has(.choice-btn.expanded) {
-  padding-bottom: 3.4rem;
-}
 .choice-btn.expanded {
+  position: relative;
   height: auto;
   min-height: 44px;
   display: flex;
@@ -385,8 +383,23 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
   align-items: center;
   justify-content: center;
   gap: 4px;
+  padding: 10px 3.4rem 10px 12px;
   text-align: center;
   overflow-wrap: anywhere;
+  cursor: default;
+}
+.choice-btn.expanded #speakerAnswer {
+  top: 4px !important;
+  right: 4px !important;
+  bottom: auto !important;
+  width: 2.6rem;
+  height: 2.6rem;
+  z-index: 2;
+  cursor: pointer;
+}
+.choice-btn.expanded #speakerAnswer svg {
+  width: 1.7rem;
+  height: 1.7rem;
 }
 .choice-btn .choice-answer,
 .choice-btn .choice-pos,
