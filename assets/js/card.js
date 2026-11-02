@@ -90,7 +90,7 @@ function syncCardHeights() {
     q.style.maxHeight = "";
     a.style.maxHeight = "";
 
-    if (state.choiceMode) return;
+    if (state.choiceMode || window.matchMedia("(min-width: 901px)").matches) return;
 
     const h = Math.max(q.offsetHeight, a.offsetHeight);
     q.style.minHeight = h + "px";
