@@ -585,7 +585,15 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 @media(max-width:480px){ .ratebar .btn{padding:12px 10px; font-size:12px} }
 @media(max-width:460px){ header h1{font-size:20px} .subtitle{font-size:12px} }
-@media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+@media(max-width:900px){
+  .grid-2{grid-template-columns:1fr}
+  main.container{
+    margin-bottom:0;
+  }
+  #learnSection{
+    margin-bottom:0;
+  }
+}
 /* NEUE REGELN: Anpassung der Schriftgröße für ZH Tempo (Rate) und ZH Tonhöhe (Pitch) */
 #rateZhRange, #pitchZhRange {
  font-size: 16px; /* Größere Schrift für die Slider selbst (falls sie Labels haben) */
