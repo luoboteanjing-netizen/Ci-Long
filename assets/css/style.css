@@ -1754,13 +1754,50 @@ html, body {
   #learnSection {
     margin: 0;
     min-height: 0;
+    height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
 
-  #learnSection:not(.choice-active) #promptBox,
-  #learnSection:not(.choice-active) #solBox {
-    flex: 1 1 0;
+  #learnSection .section-title,
+  #learnSection #lessonStats,
+  #learnSection .card-controls,
+  #learnSection #rateBar {
+    flex: 0 0 auto;
+  }
+
+  #learnSection .learn-panels {
+    flex: 1 1 auto;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #learnSection #promptBox,
+  #learnSection.choice-active #promptBox {
+    flex: 0 0 25%;
+    height: auto;
+    min-height: 0;
+    max-height: 25%;
+    overflow: auto;
+  }
+
+  #learnSection .solution {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #learnSection #solBox,
+  #learnSection.choice-active #solBox {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: auto;
   }
 }
